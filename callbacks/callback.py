@@ -31,12 +31,20 @@ async def handle_group(callback: CallbackQuery):
     user_id = str(callback.from_user.id)
     group_id = int(callback.data.split('_')[1])
 
+
     if user_id not in common_func.user_configs:
         common_func.user_configs[user_id] = {}
 
     common_func.user_configs[user_id].update({
-        'group_id': group_id
+        'group_id': group_id,
+        'url_id': f'groupOid={group_id}',
+        'who': 'student',
+        'username': callback.from_user.username,
+        'name': callback.from_user.full_name
     })
+
+    group_name, facultyOid = common_func.get_group_name(callback, group_id)
+    common_func.user_configs[user_id]['group_name'] = group_name
 
     common_func.save_configs(common_func.user_configs)
 

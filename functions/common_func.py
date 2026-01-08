@@ -10,7 +10,6 @@ from dictionary import const_dictionary
 load_dotenv()
 API_BASE_URL = os.getenv('API_BASE_URL')
 
-
 def load_configs():
     if os.path.exists(const_dictionary.CONFIG_FILE): 
         with open(const_dictionary.CONFIG_FILE, 'r', encoding='utf-8') as f: 
@@ -109,11 +108,45 @@ def get_weekday(date_str):
     return weekday
 
 def short_name(full_name):
-    full_name = full_name.split()
-    surname = full_name[0]
-    name = full_name[1][0]
-    mid_name = full_name[2][0]
+    if not full_name:
+        return 'Неизвестно'
 
-    text = f'{surname} {name}.{mid_name}'
+    parts = full_name.split()
 
-    return text
+    if len(parts) >= 3:
+        surname, name, mid_name = parts[0], parts[1], parts[2]
+        return f'{surname} {name[0]}.{mid_name[0]}.'
+    elif len(parts) == 2:
+        surname, name = parts
+        return f'{surname} {name[0]}.'
+    else:
+        return parts[0]
+
+
+def get_group_name(message, group_id):
+    from functions import teachers_file
+    
+    user_id = str(message.from_user.id)
+    who = user_configs.get(user_id, {}).get("who")
+
+
+    if who == "teacher":
+        for t in teachers_file.teacher_file:
+            if t["lecturerOid"] == group_id:
+                teacher_name = t["fio"]
+                return teacher_name, None
+        return "Преподаватель", None
+    
+    facultyOid = user_configs.get(user_id, {}).get('facultyOid')
+
+    group_url = f'{API_BASE_URL}/groups?facultyOid={facultyOid}'
+    group_r = requests.get(group_url)
+    names = group_r.json()
+
+    if who == 'student':
+       for name in names:
+        if name['groupOid'] == group_id:
+            return name['name'], facultyOid
+
+
+

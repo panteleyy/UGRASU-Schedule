@@ -5,9 +5,10 @@ from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 
+
 from keyboards import inline, reply
 from dictionary import const_dictionary
-from functions import common_func, async_func
+from functions import common_func, async_func, teachers_file
 
 router = Router()
 
@@ -15,19 +16,19 @@ load_dotenv()
 ADMIN_ID = int(os.getenv('ADMIN_ID'))
 SECRET_WORD_LOGS = os.getenv('SECRET_WORD_LOGS')
 SECRET_WORD_CONFIGS = os.getenv('SECRET_WORD_CONFIGS')
+API_BASE_URL = os.getenv('API_BASE_URL')
 
 @router.message(Command('start'))
 async def start_message(message: types.Message):
     update_text = (
-    'Версия 1.0 «неРасписания ЮГУ» уже здесь! 🎉\n\n'
-    'Что нового:\n\n'
-    '📚 Просмотр расписания для всех факультетов и групп ЮГУ\n\n'
-    '⚡ Более стабильная и быстрая работа благодаря переработанному коду\n\n'
-    '🎨 Настраиваемые темы расписания — выбери свой стиль отображения /theme\n\n'
-    '🛠 Улучшена обработка ошибок — теперь бот реже зависает(но это не точно)\n\n'
-    '✨ Маленькие улучшения интерфейса для удобства использования\n\n'
-    'Чтобы начать, выбери свою группу: /group\n\n'
-    
+    'Версия 1.1 «неРасписания ЮГУ» уже здесь! 🚀\n\n'
+    '👨‍🏫 Добавлен просмотр расписания преподавателей /teacher\n\n'
+    '🔧 Исправлены ошибки, повышена стабильность работы бота\n\n'
+    '⚙️ Улучшена логика формирования ссылок на расписание\n\n'
+    '🧹 Небольшие доработки интерфейса и оптимизация\n\n'
+    '👉 Чтобы начать - выбери свою группу или преподавателя: /group или /teacher\n\n'
+    '🎨 Темы для расписания - /theme\n\n'
+    'ℹ️ Если что-то пойдёт не так писать: @panteleeyy\n'
 )
     await message.answer(update_text)
 
@@ -42,27 +43,64 @@ async def group_command(message: types.Message):
 @router.message(Command('group'))
 async def group_command(message: types.Message):
     await message.answer('Выбери факультет:', reply_markup=common_func.find_faculties())
+
 @router.message(lambda message: 'расписание на сегодня' == message.text.lower())
 async def ansewer(message: types.Message):
+
+
+    
+    user_id = str(message.from_user.id)
+
+    if user_id in common_func.user_configs:
+        common_func.user_configs[user_id]['await_teacher'] = False
+        common_func.user_configs[user_id]['username'] = message.from_user.username
+        common_func.save_configs(common_func.user_configs)
+
     today_date = datetime.today().date()
     day, month = common_func.date_to_text(today_date)
     weekday = common_func.get_weekday(today_date)
 
-    await async_func.shedule_by_date(message, today_date, day, month, weekday)
+    
+    url_id = common_func.user_configs.get(user_id, {}).get('url_id')
+
+    await async_func.shedule_by_date(message, today_date, day, month, weekday, user_id, url_id)
 
 @router.message(lambda message: 'расписание на завтра' == message.text.lower())
 async def ansewer(message: types.Message):
+    user_id = str(message.from_user.id)
+
+    if user_id in common_func.user_configs:
+        common_func.user_configs[user_id]['await_teacher'] = False
+        common_func.user_configs[user_id]['username'] = message.from_user.username
+        common_func.save_configs(common_func.user_configs)
+
     tommorow_date = datetime.today().date() + timedelta(days=1)
     day, month = common_func.date_to_text(tommorow_date)
     weekday = common_func.get_weekday(tommorow_date)
 
-    await async_func.shedule_by_date(message, tommorow_date, day, month, weekday)
+    
+    url_id = common_func.user_configs.get(user_id, {}).get('url_id')
+
+    await async_func.shedule_by_date(message, tommorow_date, day, month, weekday, user_id, url_id)
 
 @router.message(lambda message: 'выбрать дату' == message.text.lower())
 async def ansewer(message: types.Message):
+    user_id = str(message.from_user.id)
+
+    if user_id in common_func.user_configs:
+        common_func.user_configs[user_id]['await_teacher'] = False
+        common_func.save_configs(common_func.user_configs)
+
     await message.answer('Выбери день', reply_markup=common_func.dates_to_keyboard())
 @router.message(lambda message: any(month in message.text for month in const_dictionary.MONTHS.values()))
 async def answer(message: types.Message):
+
+    user_id = str(message.from_user.id)
+
+    if user_id in common_func.user_configs:
+        common_func.user_configs[user_id]['await_teacher'] = False
+        common_func.save_configs(common_func.user_configs)
+
     day, month = common_func.text_to_date(message.text)
     year = datetime.today().year
     
@@ -70,9 +108,37 @@ async def answer(message: types.Message):
     day, month = common_func.date_to_text(user_date)
 
     weekday_part = user_date.weekday()
-    weekday = const_dictionary.WEEKDAYS.get(weekday_part) 
+    weekday = const_dictionary.WEEKDAYS.get(weekday_part)
 
-    await async_func.shedule_by_date(message, user_date, day, month, weekday)
+    
+    url_id = common_func.user_configs.get(user_id, {}).get('url_id')
+
+    await async_func.shedule_by_date(message, user_date, day, month, weekday, user_id, url_id)
+
+@router.message(Command('changelog'))
+async def ansewer(message: types.Message):
+    await message.answer(
+    "Версия 1.1 «неРасписания ЮГУ» уже тут! 🚀\n\n"
+    "👨‍🏫 Добавлена возможность смотреть расписание преподавателей: /teacher\n\n"
+    "🔧 Исправлены ошибки, повышена стабильность работы бота\n\n"
+    "Если бот не отвечает писать: @panteleeyy\nСпасибо, что пользуетесь ботом!"
+)
+    
+@router.message(lambda message: 'что нового?' == message.text.lower())
+async def ansewer(message: types.Message):
+    user_id = str(message.from_user.id)
+
+    if user_id in common_func.user_configs:
+        common_func.user_configs[user_id]['await_teacher'] = False
+        common_func.save_configs(common_func.user_configs)
+
+    await message.answer(
+    "Версия 1.1 «неРасписания ЮГУ» уже тут! 🚀\n"
+    '(Эта кнопка скоро пропадет)\n\n'
+    "👨‍🏫 Добавлена возможность смотреть расписание преподавателей: /teacher\n\n"
+    "🔧 Исправлены ошибки, повышена стабильность работы бота\n\n"
+    "Если бот не отвечает писать: @panteleeyy\nСпасибо, что пользуетесь ботом!"
+)
     
 @router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_WORD_LOGS.lower())
 async def what(message: types.Message):
@@ -83,8 +149,52 @@ async def what(message: types.Message):
 
 @router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_WORD_CONFIGS.lower())
 async def what(message: types.Message):
-    await message.answer('иба чотко')
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
 
     await message.answer_document(document=types.FSInputFile(path='user_settings.json'), caption=f'Конфиг пользователей за {now_time}')
     await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+
+@router.message(Command('teacher'))
+async def teachers(message: types.Message):
+    user_id = str(message.from_user.id)
+
+    if user_id not in common_func.user_configs:
+        common_func.user_configs[user_id] = {}
+
+    common_func.user_configs[user_id]['await_teacher'] = True
+    common_func.save_configs(common_func.user_configs)
+
+    await message.answer('Напишите ФИО преподавателя, по примеру: Иванов И И\n(Регистр не имеет значения)')
+@router.message()
+async def answer(message: types.Message):
+    user_id = str(message.from_user.id)
+    if not common_func.user_configs.get(user_id, {}).get('await_teacher'):
+        return
+
+    user_input = message.text.lower().strip()
+    teacher_id = teachers_file.get_teacheroid(user_input)
+   
+    if teacher_id is None:
+        await message.answer('❌ Преподаватель не найден, попробуйте еще раз')
+        return
+
+
+    if user_id not in common_func.user_configs:
+        common_func.user_configs[user_id] = {}
+
+    common_func.user_configs[user_id].update({
+        'group_id': teacher_id,
+        'url_id': f'lecturerOid={teacher_id}',
+        'theme': 'default',
+        'await_teacher': False,
+        'who': 'teacher',
+        'name': message.from_user.full_name,
+    })
+
+    group_name, facultyOid = common_func.get_group_name(message, teacher_id)
+    common_func.user_configs[user_id]['group_name'] = group_name
+    common_func.user_configs[user_id]['username'] = message.from_user.username
+
+    common_func.save_configs(common_func.user_configs)
+
+    await message.answer(f'✅ Преподаватель выбран - {group_name}')

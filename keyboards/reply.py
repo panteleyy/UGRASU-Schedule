@@ -9,4 +9,4 @@ kb_look = [
         types.KeyboardButton(text='Выбрать дату')
     ]
 ]
-keyboard_look = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=kb_look)
+keyboard_look = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=kb_look, input_field_placeholder='@panteleeyy')

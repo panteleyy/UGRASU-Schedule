@@ -32,23 +32,6 @@ git clone https://github.com/panteleyy/UGRASU-Schedule
 ```
 The code is organized into folders by functionality. You can use it as a base for your own projects - non-commercial use only (see LICENSE.txt file  for details).
 
-# Functionality & screenshots
-
-### Faculty and group Selection:
-
-<img src="images/select_facul.png" width="400" alt="Schedule preview">  <img src="images/select_group.png" width="400" alt="Schedule preview">
-
-### Today’s schedule and date selection:
-
-<img src="images/today_schedule.png" width="400" alt="Schedule preview">  <img src="images/date_schedule.png" width="400" alt="Schedule preview"> 
-
-### Theme Customization:
-
-<img src="images/theme_command.png" width="400" alt="Schedule preview">  <img src="images/ugrasu_theme.png" width="400" alt="Schedule preview"> 
-
-More screenshots can be found in the `images/` directory inside the repository.
-
-
 # Author
 Kirill (panteleey)
 
