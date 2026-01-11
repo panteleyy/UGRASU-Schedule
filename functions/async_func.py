@@ -49,7 +49,7 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
     
     user_theme = common_func.user_configs.get(user_id, {}).get('theme')
 
-    text_shedule = f'📅Расписание на {day} {month}, {weekday}\n'
+    text_shedule = f'📅Расписание на {day} {month}, {weekday}, группа: {group_name}\n'
     if user == 'teacher':
         text_shedule += group_name
         text_shedule += '\n'
@@ -84,6 +84,7 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
         'date_time': now_time,
         'username': message.from_user.username,
         'name': message.from_user.full_name,
+        'id': message.from_user.id,
         'groupOid': group_id,
         'faculty_id': facultyOid,
         'group_name': group_name,

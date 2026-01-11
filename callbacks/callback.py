@@ -1,11 +1,68 @@
 from aiogram.types import CallbackQuery
-from aiogram import Router
-from aiogram import F
+from aiogram import F, types, Router
+from datetime import datetime
+from dotenv import load_dotenv
+import os
+from aiogram import BaseMiddleware
+from aiogram.types import Message
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.context import FSMContext
+import json
+from aiogram.filters import BaseFilter
 
-from functions import common_func
-from keyboards import reply
+
+from functions import common_func, async_func
+from keyboards import reply, inline
 
 router = Router()
+
+load_dotenv()
+ADMIN_ID = int(os.getenv('ADMIN_ID'))
+
+class BanState(StatesGroup): # Состояние бана
+    waiting_user_id = State()
+
+class IsAdmin(BaseFilter): # Класс админ
+    async def __call__(self, event) -> bool:
+        return event.from_user.id == ADMIN_ID
+
+bot_disable = False
+
+@router.callback_query(IsAdmin(), F.data == 'disable_bot')
+async def bot_active(callback: CallbackQuery):
+    global bot_disable
+    bot_disable = True
+
+    await callback.message.edit_reply_markup(reply_markup=inline.admin_keyboard_on)
+    await callback.answer()
+
+@router.callback_query(IsAdmin(), F.data == 'enable_bot')
+async def bot_active(callback: CallbackQuery):
+    global bot_disable
+    bot_disable = False
+
+    await callback.message.edit_reply_markup(reply_markup=inline.admin_keyboard_off)
+    await callback.answer()
+
+class DisableBotMiddleware(BaseMiddleware):
+    async def __call__(self, handler, event, data):
+        from_user = getattr(event, 'from_user', None)
+        if not from_user:
+            return await handler(event, data)
+
+        if from_user.id == ADMIN_ID:
+            return await handler(event, data)
+        
+        state = data.get("state")
+        if state:
+            current = await state.get_state()
+            if current is not None:
+                return await handler(event, data)
+
+        if bot_disable:
+            return
+
+        return await handler(event, data)
 
 @router.callback_query(F.data.startswith('faculty_'))
 async def handle_faculty(callback: CallbackQuery):
@@ -82,3 +139,87 @@ async def handle_themes(callback: CallbackQuery):
     common_func.save_configs(common_func.user_configs)
 
     await callback.message.answer('Тема выбрана!')
+
+@router.callback_query(IsAdmin(), F.data.startswith('logs_bt')) # Отправка логов по кнопки с панели администратора
+async def send_logs_bt(callback: CallbackQuery):
+    now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S') # Дата и время прямо сейчас
+    await callback.answer() # Закрываем часики
+    await callback.message.answer_document(
+        document=types.FSInputFile(path='logs.json'), 
+        caption=f'Логи бота за {now_time}, requests - {async_func.request_counter}') # Отправка логов по кнопке
+
+@router.callback_query(IsAdmin(), F.data.startswith('config_bt')) # Отправка конфига по кнопки с панели администратора
+async def send_logs_bt(callback: CallbackQuery):
+    await callback.answer() # Закрываем часики
+    await callback.message.answer_document(
+        document=types.FSInputFile(path='user_settings.json'), 
+        caption=f'Конфиг пользователей') # Отправка конфига по кнопке
+    
+@router.callback_query(IsAdmin(), F.data.startswith('ban_bt')) # Если Админ и ban_
+async def ban_user(callback: CallbackQuery, state: FSMContext):
+    await state.set_state(BanState.waiting_user_id) # Установка состояния "Ожидание айди"
+    await callback.message.answer('Введите ID человека:', reply_markup=inline.chanel_ban_keyboard)
+    await callback.answer()
+
+@router.message(BanState.waiting_user_id) # Если Админ и состояние ожидания айди
+async def process_ban(message: Message, state: FSMContext):
+    if not message.text.isdigit(): # Если не цифры
+        await message.answer('Нужен числовой ID!')
+        return
+
+    user_id = int(message.text)
+
+    try: # Открытие json с забанеными
+        with open('banned_users.json', 'r', encoding='utf-8') as file:
+            banned_arr = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        banned_arr = []
+
+    banned_arr.append(user_id) # Добавление айди человека в json с забанеными
+
+    await message.answer(f'✅ Пользователь {user_id} забанен')
+
+    with open('banned_users.json', 'w', encoding='utf-8') as banned_file: # Сохранение
+        json.dump(banned_arr, banned_file, ensure_ascii=False, indent=4)
+
+    await message.answer('✅ Изменения сохранены в json') 
+    await state.clear() # Закрываем часики
+
+@router.callback_query(IsAdmin(), F.data == 'cancel_ban') # Если в дате: cancel_ban и юзер Админ
+async def cancel_ban(callback: CallbackQuery, state: FSMContext):
+    await state.clear() # Чистим стейт, для отмены бана
+    await callback.message.answer('❌ Бан отменён', reply_markup=reply.keyboard_look) 
+    await callback.answer() # Убрали часики
+
+@router.callback_query(IsAdmin(), F.data == 'unban_bt') # Если в дате: unban_bt и юзер Админ
+async def ban_user(callback: CallbackQuery):
+    try: # Открытие json с забанеными
+        with open('banned_users.json', 'r', encoding='utf-8') as file:
+            banned_arr = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        banned_arr = []
+
+    if not banned_arr: # Если banned_arr пустой
+        await callback.answer('❌ Нету забаненых')
+    else: # Если не пустой
+        await callback.message.answer('Выбери кого разбанить:', reply_markup=inline.unban_user_keyboard())
+    await callback.answer()
+
+@router.callback_query(IsAdmin(), F.data.startswith('unban_')) # Если в дате: _unban и юзер - Админ
+async def handle_group(callback: CallbackQuery):
+    user_id = int(callback.data.split('_')[1]) # Достаем айди забаненного из калбэка и переводим в int
+
+    try: # Открытие json с забанеными 
+        with open('banned_users.json', 'r', encoding='utf-8') as file:
+            banned_arr = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        banned_arr = []
+
+    banned_arr.remove(user_id) # Удаляем айди из json
+    await callback.message.answer(f'✅ {user_id} - разбанен')
+
+    with open('banned_users.json', 'w', encoding='utf-8') as f: # Сохранение изменений 
+        json.dump(banned_arr, f, ensure_ascii=False, indent=2)
+
+    await callback.message.answer('✅ Изменения сохранены в json')      
+    await callback.answer() # Закрываем часики

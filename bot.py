@@ -6,9 +6,11 @@ from aiogram.types import FSInputFile
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from aiogram.fsm.storage.memory import MemoryStorage
 
 from handlers import commands
 from callbacks import callback
+from callbacks.callback import DisableBotMiddleware
 from functions import async_func
 from middleware.antispam import AntiSpamMiddleware
 
@@ -18,7 +20,7 @@ ADMIN_ID = int(os.getenv('ADMIN_ID'))
 
 async def main():
     bot = Bot(BOT_TOKEN)
-    dp = Dispatcher()
+    #dp = Dispatcher()
     
     async def send_logs():
         
@@ -42,13 +44,20 @@ async def main():
                 print(f'[LOGS ERROR] Ошибка при отправке логов: {e}')
 
             await asyncio.sleep(3600)
+    
+    dp = Dispatcher(storage=MemoryStorage())
+    dp.message.middleware(commands.BanMiddleware())
+    dp.callback_query.middleware(commands.BanMiddleware())
+
+    dp.message.middleware(AntiSpamMiddleware(max_messages=4, time_window=10))  # Подключение анти-спама 
+    dp.message.middleware(DisableBotMiddleware())
+    dp.callback_query.middleware(DisableBotMiddleware())
 
     dp.include_routers(
-        commands.router,
+        commands.router,    
         callback.router
     )
 
-    dp.message.middleware(AntiSpamMiddleware(max_messages=5, time_window=10))  # Подключение анти-спама 
 
     asyncio.create_task(send_logs())
     await dp.start_polling(bot)

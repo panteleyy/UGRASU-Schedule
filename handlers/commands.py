@@ -4,6 +4,12 @@ from aiogram import types
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+import json
+from aiogram import BaseMiddleware
+import json
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 
 
 from keyboards import inline, reply
@@ -17,20 +23,36 @@ ADMIN_ID = int(os.getenv('ADMIN_ID'))
 SECRET_WORD_LOGS = os.getenv('SECRET_WORD_LOGS')
 SECRET_WORD_CONFIGS = os.getenv('SECRET_WORD_CONFIGS')
 API_BASE_URL = os.getenv('API_BASE_URL')
+SECRET_ADMIN_WORD = os.getenv('SECRET_ADMIN_WORD')
+
+class TeacherState(StatesGroup):
+    waiting_name = State()
+
+class BanMiddleware(BaseMiddleware):
+    async def __call__(self, handler, event, data):
+        user = getattr(event, "from_user", None)
+        if not user:
+            return await handler(event, data)
+
+        try:
+            with open('banned_users.json', 'r', encoding='utf-8') as f:
+                banned = json.load(f)
+        except:
+            banned = []
+
+        if user.id in banned and user.id != ADMIN_ID:
+            return  
+
+        return await handler(event, data)
 
 @router.message(Command('start'))
 async def start_message(message: types.Message):
     update_text = (
-    'Версия 1.1 «неРасписания ЮГУ» уже здесь! 🚀\n\n'
-    '👨‍🏫 Добавлен просмотр расписания преподавателей /teacher\n\n'
-    '🔧 Исправлены ошибки, повышена стабильность работы бота\n\n'
-    '⚙️ Улучшена логика формирования ссылок на расписание\n\n'
-    '🧹 Небольшие доработки интерфейса и оптимизация\n\n'
-    '👉 Чтобы начать - выбери свою группу или преподавателя: /group или /teacher\n\n'
-    '🎨 Темы для расписания - /theme\n\n'
-    'ℹ️ Если что-то пойдёт не так писать: @panteleeyy\n'
-)
-    await message.answer(update_text)
+    '👋 Привет! Это бот для просмотра расписания занятий в ЮГУ\n\n'
+    '👥 Для того что бы посмотреть расписание нужно выбрать группу или преподавателя: /group или /teacher\n\n'
+    '🎨 Так же можно изменить тему отабражения расписания: /theme\n\n'
+    'ℹ️ Больше информации: /info')
+    await message.answer(update_text, reply_markup=reply.keyboard_look)
 
 @router.message(Command('theme'))
 async def start_message(message: types.Message):
@@ -38,7 +60,11 @@ async def start_message(message: types.Message):
 
 @router.message(Command('info'))
 async def group_command(message: types.Message):
-    await message.answer('Команды бота:\n/start - полный перзапуск бота, смена группы\n/group - изменить группу\n/theme - изменить тему расписания\nСообщать о багах, предложениях и тд: @panteleeyy', reply_markup=reply.keyboard_look)
+    await message.answer('Команды бота:\n'
+    '/start - полный перзапуск бота, смена группы\n'
+    '/group - изменить группу\n'
+    '/theme - изменить тему расписания\n' \
+    'Сообщать о багах, предложениях и тд: @panteleeyy', reply_markup=reply.keyboard_look)
 
 @router.message(Command('group'))
 async def group_command(message: types.Message):
@@ -47,8 +73,6 @@ async def group_command(message: types.Message):
 @router.message(lambda message: 'расписание на сегодня' == message.text.lower())
 async def ansewer(message: types.Message):
 
-
-    
     user_id = str(message.from_user.id)
 
     if user_id in common_func.user_configs:
@@ -124,21 +148,11 @@ async def ansewer(message: types.Message):
     "Если бот не отвечает писать: @panteleeyy\nСпасибо, что пользуетесь ботом!"
 )
     
-@router.message(lambda message: 'что нового?' == message.text.lower())
-async def ansewer(message: types.Message):
-    user_id = str(message.from_user.id)
+    
+@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_ADMIN_WORD.lower())
+async def admin_panel(message: types.Message):
+    await message.answer('Панель администратора:', reply_markup=inline.admin_keyboard_off)
 
-    if user_id in common_func.user_configs:
-        common_func.user_configs[user_id]['await_teacher'] = False
-        common_func.save_configs(common_func.user_configs)
-
-    await message.answer(
-    "Версия 1.1 «неРасписания ЮГУ» уже тут! 🚀\n"
-    '(Эта кнопка скоро пропадет)\n\n'
-    "👨‍🏫 Добавлена возможность смотреть расписание преподавателей: /teacher\n\n"
-    "🔧 Исправлены ошибки, повышена стабильность работы бота\n\n"
-    "Если бот не отвечает писать: @panteleeyy\nСпасибо, что пользуетесь ботом!"
-)
     
 @router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_WORD_LOGS.lower())
 async def what(message: types.Message):
@@ -155,46 +169,41 @@ async def what(message: types.Message):
     await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 @router.message(Command('teacher'))
-async def teachers(message: types.Message):
-    user_id = str(message.from_user.id)
-
-    if user_id not in common_func.user_configs:
-        common_func.user_configs[user_id] = {}
-
-    common_func.user_configs[user_id]['await_teacher'] = True
-    common_func.save_configs(common_func.user_configs)
-
-    await message.answer('Напишите ФИО преподавателя, по примеру: Иванов И И\n(Регистр не имеет значения)')
-@router.message()
-async def answer(message: types.Message):
-    user_id = str(message.from_user.id)
-    if not common_func.user_configs.get(user_id, {}).get('await_teacher'):
-        return
-
+async def teachers(message: Message, state: FSMContext):
+    await state.set_state(TeacherState.waiting_name)
+    await message.answer(
+        'Напишите ФИО преподавателя, по примеру: Иванов И И\n(Регистр не имеет значения)'
+    )
+@router.message(TeacherState.waiting_name)
+async def process_teacher(message: Message, state: FSMContext):
     user_input = message.text.lower().strip()
     teacher_id = teachers_file.get_teacheroid(user_input)
-   
+
     if teacher_id is None:
         await message.answer('❌ Преподаватель не найден, попробуйте еще раз')
         return
 
+    user_id = str(message.from_user.id)
 
-    if user_id not in common_func.user_configs:
-        common_func.user_configs[user_id] = {}
-
+    common_func.user_configs.setdefault(user_id, {})
     common_func.user_configs[user_id].update({
         'group_id': teacher_id,
         'url_id': f'lecturerOid={teacher_id}',
         'theme': 'default',
-        'await_teacher': False,
         'who': 'teacher',
         'name': message.from_user.full_name,
+        'username': message.from_user.username,
     })
 
     group_name, facultyOid = common_func.get_group_name(message, teacher_id)
     common_func.user_configs[user_id]['group_name'] = group_name
     common_func.user_configs[user_id]['username'] = message.from_user.username
-
     common_func.save_configs(common_func.user_configs)
+    
 
-    await message.answer(f'✅ Преподаватель выбран - {group_name}')
+    await message.answer(f'✅ Преподаватель выбран')
+    await state.clear()
+
+
+    
+

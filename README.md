@@ -16,10 +16,10 @@ You can find all used framework below.
 
 | Tool | Description |
 |------|--------------|
-| 🐍 **Python 3.14.2** | Main programmin language |
-| 🤖 **aiogram 3.24.0** | Modern asynchronous framework for Telegram bots |
+| 🐍 **Python 3.13.7** | Main programmin language |
+| 🤖 **aiogram 3.22.0** | Modern asynchronous framework for Telegram bots |
 | 🌐 **requests 2.32.5** | Framework for HTTP requests |
-| 🗝️ **python-dotenv 1.2.1** | Used to load environment variables (like tokens and API keys) from a .env file |
+| 🗝️ **python-dotenv 1.1.1** | Used to load environment variables (like tokens and API keys) from a .env file |
 
 # How to build?
 
@@ -31,35 +31,6 @@ If you want to explore the source code:
 git clone https://github.com/panteleyy/UGRASU-Schedule
 ```
 The code is organized into folders by functionality. You can use it as a base for your own projects - non-commercial use only (see LICENSE.txt file  for details).
-
-# Functionality & screenshots
-
-- **Faculty and Group Selection**  
-  The user selects a faculty and group. After that, the schedule is tied to the selected group by default, and all subsequent requests display the schedule specifically for that group.
-
-- **Viewing Schedule for Any Date**  
-  Inline buttons are available for viewing the schedule for today/tomorrow, along with a separate button to display a list of dates for selection.
-
-- **Viewing Teacher Schedules**  
-  The user selects a teacher by entering their last name and views their full schedule for the selected date, including groups, classrooms, and types of classes.
-
-- **Theme Customization**  
-  Multiple themes are available for displaying the schedule. The selected theme is saved for the user and automatically applied to all subsequent bot messages.
-
-### Faculty and group Selection:
-
-<img src="images/select_facul.png" width="400" alt="Schedule preview">  <img src="images/select_group.png" width="400" alt="Schedule preview">
-
-### Today’s schedule and date selection:
-
-<img src="images/today_schedule.png" width="400" alt="Schedule preview">  <img src="images/date_schedule.png" width="400" alt="Schedule preview"> 
-
-### Theme Customization:
-
-<img src="images/theme_command.png" width="400" alt="Schedule preview">  <img src="images/ugrasu_theme.png" width="400" alt="Schedule preview"> 
-
-More screenshots can be found in the `images/` directory inside the repository.
-
 
 # Author
 Kirill (panteleey)
