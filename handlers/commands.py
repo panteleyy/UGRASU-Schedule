@@ -9,8 +9,7 @@ from aiogram import BaseMiddleware
 import json
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
-
+from aiogram.types import Message, FSInputFile
 
 from keyboards import inline, reply
 from dictionary import const_dictionary
@@ -24,6 +23,7 @@ SECRET_WORD_LOGS = os.getenv('SECRET_WORD_LOGS')
 SECRET_WORD_CONFIGS = os.getenv('SECRET_WORD_CONFIGS')
 API_BASE_URL = os.getenv('API_BASE_URL')
 SECRET_ADMIN_WORD = os.getenv('SECRET_ADMIN_WORD')
+SECRET_CHART_WORD = os.getenv('SECRET_CHART_WORD')
 
 class TeacherState(StatesGroup):
     waiting_name = State()
@@ -153,19 +153,25 @@ async def ansewer(message: types.Message):
 async def admin_panel(message: types.Message):
     await message.answer('Панель администратора:', reply_markup=inline.admin_keyboard_off)
 
-    
 @router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_WORD_LOGS.lower())
-async def what(message: types.Message):
+async def send_logs(message: types.Message):
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
 
     await message.answer_document(document=types.FSInputFile(path='logs.json'), caption=f'Логи бота за {now_time}, requests - {async_func.request_counter}')
     await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 @router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_WORD_CONFIGS.lower())
-async def what(message: types.Message):
+async def send_config(message: types.Message):
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
 
     await message.answer_document(document=types.FSInputFile(path='user_settings.json'), caption=f'Конфиг пользователей за {now_time}')
+    await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_CHART_WORD.lower())
+async def send_chart(message: types.Message):
+    common_func.make_chart() # Создание графика из json
+    
+    photo = FSInputFile('chart.png')
+    await message.answer_photo(photo=photo) # Отправка
     await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 @router.message(Command('teacher'))
@@ -199,7 +205,6 @@ async def process_teacher(message: Message, state: FSMContext):
     common_func.user_configs[user_id]['group_name'] = group_name
     common_func.user_configs[user_id]['username'] = message.from_user.username
     common_func.save_configs(common_func.user_configs)
-    
 
     await message.answer(f'✅ Преподаватель выбран')
     await state.clear()

@@ -4,6 +4,7 @@ import requests
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+import matplotlib.pyplot as plt
 
 from dictionary import const_dictionary
 
@@ -148,5 +149,57 @@ def get_group_name(message, group_id):
         if name['groupOid'] == group_id:
             return name['name'], facultyOid
 
+def save_hour_requests():
+    
+    current_hour = datetime.now().strftime('%d.%m - %H')
+
+    try:
+        with open('hour_requests.json', 'r', encoding='utf-8') as file:
+            hour_requests = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        hour_requests = []
+
+    for item in hour_requests:  # Если уже есть такая дата то добавить 1 запрос
+        if item['date'] == current_hour:
+            item['hour_requests'] += 1
+            break    
+    else: # Иначе добавить новый 
+
+        hour_requests.append(
+            {
+                'date': current_hour, 
+                'hour_requests': 1 
+            }
+        )
+    
+    if len(hour_requests) > 24: # Учитывать только 24 
+       hour_requests = hour_requests[-24:]
 
 
+    with open('hour_requests.json', 'w', encoding='utf-8') as hour_requests_file:
+        json.dump(hour_requests, hour_requests_file, ensure_ascii=False, indent=4)
+
+def make_chart():
+
+    with open("hour_requests.json", 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    now_time = []
+    hour_requests_counter = []
+
+    for item in data: # Достаем данные из json и добавляем в массивы
+        now_time.append(item['date'])
+        hour_requests_counter.append(item['hour_requests'])
+
+    plt.figure(figsize=(10, 5))
+
+    plt.grid(True)
+    plt.bar(now_time, hour_requests_counter)
+    plt.xticks(rotation=25)
+    plt.grid(axis='y', linestyle='--', alpha=0.9)
+    plt.title('Активность за последние часы')   
+    plt.ylabel('Количество запросов')
+
+    plt.savefig('chart.png') 
+    plt.close()
+    #plt.show()

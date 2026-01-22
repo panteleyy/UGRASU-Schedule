@@ -77,6 +77,8 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
 
     global request_counter # Cчетчк запросов
     request_counter += 1   
+    
+    common_func.save_hour_requests() # Запись в json
 
     # Запись и сохранение логов
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
@@ -102,5 +104,3 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
     
     with open('logs.json', 'w', encoding='utf-8') as logs_file:
         json.dump(log_arr, logs_file, ensure_ascii=False, indent=4)
-
-    
