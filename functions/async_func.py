@@ -49,10 +49,11 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
     
     user_theme = common_func.user_configs.get(user_id, {}).get('theme')
 
-    text_shedule = f'📅Расписание на {day} {month}, {weekday}, группа: {group_name}\n'
     if user == 'teacher':
-        text_shedule += group_name
-        text_shedule += '\n'
+        text_shedule = f'📅Расписание на {day} {month}, {weekday} \n{group_name}\n'
+    else:
+        text_shedule = f'📅Расписание на {day} {month}, {weekday} \nгруппа: {group_name}\n'
+    
     for l in date_lessons:
 
         kind_of_work = l['kindOfWork']
