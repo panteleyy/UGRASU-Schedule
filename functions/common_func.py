@@ -151,7 +151,7 @@ def get_group_name(message, group_id):
 
 def save_hour_requests():
     
-    current_hour = datetime.now().strftime('%d.%m - %H')
+    current_hour = datetime.now().strftime('%d.%m - %H') # Текущий час + дата
 
     try:
         with open('hour_requests.json', 'r', encoding='utf-8') as file:
@@ -163,7 +163,7 @@ def save_hour_requests():
         if item['date'] == current_hour:
             item['hour_requests'] += 1
             break    
-    else: # Иначе добавить новый 
+    else: # Иначе добавить новый блок
 
         hour_requests.append(
             {
@@ -191,15 +191,22 @@ def make_chart():
         now_time.append(item['date'])
         hour_requests_counter.append(item['hour_requests'])
 
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(10, 5)) # Размеры графика
 
-    plt.grid(True)
-    plt.bar(now_time, hour_requests_counter)
-    plt.xticks(rotation=25)
-    plt.grid(axis='y', linestyle='--', alpha=0.9)
-    plt.title('Активность за последние часы')   
-    plt.ylabel('Количество запросов')
+    #plt.grid(True)
 
-    plt.savefig('chart.png') 
-    plt.close()
+    plt.bar(now_time, hour_requests_counter) # Что будет в графике
+    plt.xticks(rotation=25) # Поворот подписей на 25 градусов
+
+    plt.grid(axis='y', linestyle='--', alpha=0.7) # Cетка по x
+    plt.grid(axis='x', linestyle='--', alpha=0.7) # Сетка по y
+
+    for i in range(len(now_time)): # Количество запросов над каждым столбиком
+        plt.text(i, hour_requests_counter[i], str(hour_requests_counter[i]), ha='center', va='bottom', fontsize=10)
+
+    plt.title('Активность за последние часы') # Название графика
+    plt.ylabel('Количество запросов') # Подпись y
+
+    plt.savefig('chart.png') # Сохранение 
+    plt.close() # Закрытие
     #plt.show()
