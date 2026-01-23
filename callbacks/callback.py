@@ -140,7 +140,7 @@ async def handle_themes(callback: CallbackQuery):
 
     await callback.message.answer('Тема выбрана!')
 
-@router.callback_query(IsAdmin(), F.data.startswith('logs_bt')) # Отправка логов по кнопки с панели администратора
+@router.callback_query(IsAdmin(), F.data == ('logs_bt')) # Отправка логов по кнопки с панели администратора
 async def send_logs_bt(callback: CallbackQuery):
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S') # Дата и время прямо сейчас
     await callback.answer() # Закрываем часики
@@ -148,12 +148,26 @@ async def send_logs_bt(callback: CallbackQuery):
         document=types.FSInputFile(path='logs.json'), 
         caption=f'Логи бота за {now_time}, requests - {async_func.request_counter}') # Отправка логов по кнопке
 
-@router.callback_query(IsAdmin(), F.data.startswith('config_bt')) # Отправка конфига по кнопки с панели администратора
+@router.callback_query(IsAdmin(), F.data == ('config_bt')) # Отправка конфига по кнопки с панели администратора
 async def send_logs_bt(callback: CallbackQuery):
     await callback.answer() # Закрываем часики
     await callback.message.answer_document(
         document=types.FSInputFile(path='user_settings.json'), 
         caption=f'Конфиг пользователей') # Отправка конфига по кнопке
+    
+@router.callback_query(IsAdmin(), F.data == 'bans_bt') # Если в дате: unban_bt и юзер Админ
+async def send_bans_bt(callback: CallbackQuery):
+    await callback.answer() # Закрываем часики
+    await callback.message.answer_document(
+        document=types.FSInputFile(path='banned_users.json'), 
+        caption=f'Файл забаненных') # Отправка конфига по кнопке
+    
+@router.callback_query(IsAdmin(), F.data == 'hours_bt') # Если в дате: unban_bt и юзер Админ
+async def send_bans_bt(callback: CallbackQuery):
+    await callback.answer() # Закрываем часики
+    await callback.message.answer_document(
+        document=types.FSInputFile(path='hour_requests.json'), 
+        caption=f'Часовые запросы') # Отправка конфига по кнопке
     
 @router.callback_query(IsAdmin(), F.data.startswith('ban_bt')) # Если Админ и ban_
 async def ban_user(callback: CallbackQuery, state: FSMContext):
