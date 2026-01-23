@@ -30,6 +30,8 @@ def unban_user_keyboard():
 admin_keyboard_off = InlineKeyboardMarkup(
         inline_keyboard=[[InlineKeyboardButton(text='📄 Логи', callback_data='logs_bt'),
                          InlineKeyboardButton(text='⚙️ Конфиг', callback_data='config_bt')],
+                         [InlineKeyboardButton(text='🗓 Баны', callback_data='bans_bt'),
+                          InlineKeyboardButton(text='📋 Часы', callback_data='hours_bt')],
                          [InlineKeyboardButton(text='⛔️ Бан', callback_data='ban_bt'),
                         InlineKeyboardButton(text='✅ Разбан', callback_data='unban_bt')],
                         #[InlineKeyboardButton(text='👥 Пользователи сейчас', callback_data='users_now_')],
@@ -39,6 +41,8 @@ admin_keyboard_off = InlineKeyboardMarkup(
 admin_keyboard_on = InlineKeyboardMarkup(
         inline_keyboard=[[InlineKeyboardButton(text='📄 Логи', callback_data='logs_bt'),
                          InlineKeyboardButton(text='⚙️ Конфиг', callback_data='config_bt')],
+                         [InlineKeyboardButton(text='🗓 Баны', callback_data='bans_bt'),
+                          InlineKeyboardButton(text='📋 Часы', callback_data='hours_bt')],
                          [InlineKeyboardButton(text='⛔️ Бан', callback_data='ban_bt'),
                         InlineKeyboardButton(text='✅ Разбан', callback_data='unban_bt')],
                         #[InlineKeyboardButton(text='👥 Пользователи сейчас', callback_data='users_now_')],
