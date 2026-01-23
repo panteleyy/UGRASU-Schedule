@@ -155,19 +155,19 @@ async def send_logs_bt(callback: CallbackQuery):
         document=types.FSInputFile(path='user_settings.json'), 
         caption=f'Конфиг пользователей') # Отправка конфига по кнопке
     
-@router.callback_query(IsAdmin(), F.data == 'bans_bt') # Если в дате: unban_bt и юзер Админ
+@router.callback_query(IsAdmin(), F.data == 'bans_bt') 
 async def send_bans_bt(callback: CallbackQuery):
     await callback.answer() # Закрываем часики
     await callback.message.answer_document(
         document=types.FSInputFile(path='banned_users.json'), 
-        caption=f'Файл забаненных') # Отправка конфига по кнопке
+        caption=f'Файл забаненных') 
     
-@router.callback_query(IsAdmin(), F.data == 'hours_bt') # Если в дате: unban_bt и юзер Админ
+@router.callback_query(IsAdmin(), F.data == 'hours_bt') 
 async def send_bans_bt(callback: CallbackQuery):
     await callback.answer() # Закрываем часики
     await callback.message.answer_document(
         document=types.FSInputFile(path='hour_requests.json'), 
-        caption=f'Часовые запросы') # Отправка конфига по кнопке
+        caption=f'Часовые запросы') 
     
 @router.callback_query(IsAdmin(), F.data.startswith('ban_bt')) # Если Админ и ban_
 async def ban_user(callback: CallbackQuery, state: FSMContext):
