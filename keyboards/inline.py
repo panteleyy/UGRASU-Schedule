@@ -60,3 +60,6 @@ chanel_ban_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[[InlineKeyboardButton(text='❌ Отмена', callback_data='cancel_ban')]]
 )
 
+moving_keyboard_buttons = InlineKeyboardMarkup(
+    inline_keyboard=[[InlineKeyboardButton(text='<', callback_data='previos_ver'), InlineKeyboardButton(text='>', callback_data='next_ver')]]
+)  
