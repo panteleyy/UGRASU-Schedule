@@ -47,6 +47,7 @@ admin_keyboard_on = InlineKeyboardMarkup(
                          [InlineKeyboardButton(text='⛔️ Бан', callback_data='ban_bt'),
                         InlineKeyboardButton(text='✅ Разбан', callback_data='unban_bt')],
                         #[InlineKeyboardButton(text='👥 Пользователи сейчас', callback_data='users_now_')],
+                        [InlineKeyboardButton(text=f'🗑 Отчистить логи', callback_data='clear_logs')],
                         [InlineKeyboardButton(text=f'🟢 Включить бота', callback_data='enable_bot')]]
 )
     # Логи 
