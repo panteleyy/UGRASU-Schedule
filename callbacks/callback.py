@@ -193,6 +193,28 @@ async def clear_logs(callback: CallbackQuery):
     except Exception as e:
         await callback.message.answer(f'❌ Ошибка: {e}')
 
+@router.callback_query(IsAdmin(), F.data == 'clear_chart') # Удаление логов по кнопке
+async def clear_chart(callback: CallbackQuery):
+    now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
+    await callback.answer()
+    
+    try:
+        try:
+            await callback.message.answer_document(
+                document=types.FSInputFile(path='hour_requests.json'), 
+                caption=f'[BACKUP] Часовые запросы бота за {now_time}, requests - {async_func.request_counter}') # Отправка логов 
+            
+            await callback.message.answer('✅ BACKUP')
+        except Exception as e:
+            await callback.message.answer(f'❌ BACKUP Ошибка: {e}')
+
+        with open("hour_requests.json", "w") as f: # Отчистка файла
+            json.dump([], f) # Зпись в него [] что бы не был пустым
+
+        await callback.message.answer('✅ Файл с часовыми запросами удален')
+    except Exception as e:
+        await callback.message.answer(f'❌ Ошибка: {e}')
+
 @router.callback_query(IsAdmin(), F.data.startswith('ban_bt')) # Если Админ и ban_
 async def ban_user(callback: CallbackQuery, state: FSMContext):
     await state.set_state(BanState.waiting_user_id) # Установка состояния "Ожидание айди"
