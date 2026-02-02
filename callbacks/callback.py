@@ -169,6 +169,13 @@ async def send_bans_bt(callback: CallbackQuery):
         document=types.FSInputFile(path='hour_requests.json'), 
         caption=f'Часовые запросы') 
     
+@router.callback_query(IsAdmin(), F.data == 'clear_logs') # Удаление логов по кнопке
+async def clear_logs(callback: CallbackQuery):
+    await callback.answer()
+    with open("logs.json", "w") as f:
+        pass
+    await callback.message.answer('Удалил')
+
 @router.callback_query(IsAdmin(), F.data.startswith('ban_bt')) # Если Админ и ban_
 async def ban_user(callback: CallbackQuery, state: FSMContext):
     await state.set_state(BanState.waiting_user_id) # Установка состояния "Ожидание айди"
