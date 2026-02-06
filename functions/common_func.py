@@ -5,6 +5,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 from dictionary import const_dictionary
 
@@ -178,6 +179,38 @@ def save_hour_requests():
 
     with open('hour_requests.json', 'w', encoding='utf-8') as hour_requests_file:
         json.dump(hour_requests, hour_requests_file, ensure_ascii=False, indent=4)
+
+
+def save_day_requests():
+    with open('hour_requests.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    day_stats = defaultdict(int)
+
+    for item in data:
+        day = item['date'].split(' - ')[0]
+        day_stats[day] += item['hour_requests']
+
+    days = list(day_stats.keys())
+    requests = list(day_stats.values())
+
+    plt.figure(figsize=(10, 5)) # Размеры графика
+
+    plt.bar(days, requests) # Что будет в графике
+    plt.xticks(rotation=25) # Поворот подписей на 25 градусов
+
+    plt.grid(axis='y', linestyle='--', alpha=0.7) # Cетка по x
+    plt.grid(axis='x', linestyle='--', alpha=0.7) # Сетка по y
+
+    for i in range(len(days)): # Количество запросов над каждым столбиком
+        plt.text(i, requests[i], str(requests[i]), ha='center', va='bottom', fontsize=10)
+
+    plt.title('Активность за последний месяц') # Название графика
+    plt.ylabel('Количество запросов') # Подпись y
+
+    plt.savefig('day_chart.png') # Сохранение 
+    plt.close() # Закрытие
+
 
 def make_chart():
 

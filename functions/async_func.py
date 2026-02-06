@@ -80,6 +80,7 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
     request_counter += 1   
     
     common_func.save_hour_requests() # Запись в json
+    common_func.save_day_requests() 
 
     # Запись и сохранение логов
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
