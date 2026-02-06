@@ -10,6 +10,7 @@ import json
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile
+from aiogram.enums import ParseMode
 
 from keyboards import inline, reply
 from dictionary import const_dictionary
@@ -50,9 +51,13 @@ async def start_message(message: types.Message):
     update_text = (
     '👋 Привет! Это бот для просмотра расписания занятий в ЮГУ\n\n'
     '👥 Для того что бы посмотреть расписание нужно выбрать группу или преподавателя: /group или /teacher\n\n'
-    '🎨 Так же можно изменить тему отабражения расписания: /theme\n\n'
+    '🎨 Так же можно изменить тему отабражения расписания: /theme\n\n' \
+    "<blockquote>"
+    "Бот разработан студентом и не имеет официального отношения к ЮГУ."
+    "</blockquote>\n\n"
     'ℹ️ Больше информации: /info')
-    await message.answer(update_text, reply_markup=reply.keyboard_look)
+
+    await message.answer(update_text, parse_mode=ParseMode.HTML, reply_markup=reply.keyboard_look)
 
 @router.message(Command('theme'))
 async def start_message(message: types.Message):
@@ -60,11 +65,19 @@ async def start_message(message: types.Message):
 
 @router.message(Command('info'))
 async def group_command(message: types.Message):
-    await message.answer('Команды бота:\n'
-    '/start - полный перзапуск бота, смена группы\n'
-    '/group - изменить группу\n'
-    '/theme - изменить тему расписания\n' \
-    'Сообщать о багах, предложениях и тд: @panteleeyy', reply_markup=reply.keyboard_look)
+    text = (
+        "⚙️ Команды бота\n\n"
+        "/start — полный перезапуск бота, смена группы\n"
+        "/group — изменить группу\n"
+        "/theme — изменить тему расписания\n" \
+        "/changelog - список нововедений\n\n" \
+        "<blockquote>"
+        "Бот разработан студентом и не имеет официального отношения к ЮГУ."
+        "</blockquote>\n\n"
+        "Сообщать о багах и предложениях: @panteleeyy"
+    )
+
+    await message.answer(text, parse_mode=ParseMode.HTML, reply_markup=reply.keyboard_look)
 
 @router.message(Command('group'))
 async def group_command(message: types.Message):
