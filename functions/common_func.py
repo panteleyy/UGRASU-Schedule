@@ -182,17 +182,20 @@ def save_hour_requests():
 
 
 def save_day_requests():
-    with open('hour_requests.json', 'r', encoding='utf-8') as f:
-        data = json.load(f)
+    with open('hour_requests.json', 'r', encoding='utf-8') as f: 
+        hour_requests = json.load(f)
 
-    day_stats = defaultdict(int)
+    day_stats = defaultdict(int) # Словарь для хранения количества запросов по дням 
 
-    for item in data:
+    for item in hour_requests:
         day = item['date'].split(' - ')[0]
         day_stats[day] += item['hour_requests']
 
-    days = list(day_stats.keys())
-    requests = list(day_stats.values())
+    if len(day_stats) > 4: # Учитывать только 31 день 
+       day_stats = dict(list(day_stats.items())[-4:])
+
+    days = list(day_stats.keys()) # Дни для графика
+    requests = list(day_stats.values()) # Количество запросов для графика
 
     plt.figure(figsize=(10, 5)) # Размеры графика
 

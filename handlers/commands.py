@@ -25,6 +25,7 @@ SECRET_WORD_CONFIGS = os.getenv('SECRET_WORD_CONFIGS')
 API_BASE_URL = os.getenv('API_BASE_URL')
 SECRET_ADMIN_WORD = os.getenv('SECRET_ADMIN_WORD')
 SECRET_CHART_WORD = os.getenv('SECRET_CHART_WORD')
+SECRET__DAY_CHART_WORD = os.getenv('SECRET__DAY_CHART_WORD')
 
 class TeacherState(StatesGroup):
     waiting_name = State()
@@ -185,6 +186,15 @@ async def send_chart(message: types.Message):
     photo = FSInputFile('chart.png')
     await message.answer_photo(photo=photo) # Отправка
     await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET__DAY_CHART_WORD.lower())
+async def send_chart(message: types.Message):
+    common_func.save_day_requests()  # Создание графика из json
+    
+    photo = FSInputFile('day_chart.png')
+    await message.answer_photo(photo=photo) # Отправка
+    await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+
+
 
 @router.message(Command('teacher'))
 async def teachers(message: Message, state: FSMContext):
