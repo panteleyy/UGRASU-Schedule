@@ -246,3 +246,17 @@ def make_chart():
     plt.savefig('chart.png') # Сохранение 
     plt.close() # Закрытие
     #plt.show()
+
+def last_request_time(message):
+    user_id = str(message.from_user.id)
+
+    now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
+    
+    if user_id not in user_configs:
+        user_configs[user_id] = {}
+
+    user_configs[user_id].update({
+        'last_request': now_time 
+    })
+
+    save_configs(user_configs)

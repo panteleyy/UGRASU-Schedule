@@ -170,9 +170,13 @@ async def admin_panel(message: types.Message):
 
     hour = 0
     day = 0
+    users = 0
 
     with open('hour_requests.json', 'r', encoding='utf-8') as f:
         hour_requests = json.load(f)
+
+    with open('user_settings.json', 'r', encoding='utf-8') as f:
+        user_settings = json.load(f)
 
     for item in hour_requests:
         date_path, hour_path = item['date'].split(' - ')
@@ -183,10 +187,15 @@ async def admin_panel(message: types.Message):
         if date_path == current_date:
             day += item['hour_requests']
 
+    for usr in user_settings:
+        if usr:
+            users += 1
+            
     text = ('🏢 Панелька администратора:\n'
     '━━━━━━━━━━━━━━━\n'
     f'⏱ Час: {hour}\n'
-    f'📅 Сегодня: {day}\n')
+    f'📅 Сегодня: {day}\n'
+    f'👥 Пользователей: {users}')
 
     await message.answer(text, reply_markup=inline.admin_keyboard_off)
 
