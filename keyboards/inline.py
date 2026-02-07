@@ -28,42 +28,62 @@ def unban_user_keyboard():
     return unban_keyboard
 
 admin_keyboard_off = InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text='📄 Логи', callback_data='logs_bt'),
-                         InlineKeyboardButton(text='⚙️ Конфиг', callback_data='config_bt')],
-                         [InlineKeyboardButton(text='🗓 Баны', callback_data='bans_bt'),
-                          InlineKeyboardButton(text='📋 Часы', callback_data='hours_bt')],
-                         [InlineKeyboardButton(text='⛔️ Бан', callback_data='ban_bt'),
-                        InlineKeyboardButton(text='✅ Разбан', callback_data='unban_bt')],
-                        #[InlineKeyboardButton(text='👥 Пользователи сейчас', callback_data='users_now_')],
-                        [InlineKeyboardButton(text=f'🗑 Очистить логи', callback_data='clear_logs')],
-                        [InlineKeyboardButton(text=f'🗑 Очистить график', callback_data='clear_chart')],
-                        [InlineKeyboardButton(text=f'🔴 Выключить бота', callback_data='disable_bot')]]
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text='📊 За месяц', callback_data='days_chart_bt'),
+            InlineKeyboardButton(text='📊 Почасово', callback_data='hours_chart_bt'),
+        ],
+        [
+            InlineKeyboardButton(text='📄 Логи', callback_data='logs_bt'),
+            InlineKeyboardButton(text='⚙️ Конфиг', callback_data='config_bt'),
+        ],
+        [
+            InlineKeyboardButton(text='🗓 Баны', callback_data='bans_bt'),
+            InlineKeyboardButton(text='📋 Часы', callback_data='hours_bt'),
+        ],
+        [
+            InlineKeyboardButton(text='⛔️ Бан', callback_data='ban_bt'),
+            InlineKeyboardButton(text='✅ Разбан', callback_data='unban_bt'),
+        ],
+        [
+            InlineKeyboardButton(text='🗑 Очистить логи', callback_data='clear_logs_bt'),
+            InlineKeyboardButton(text='🗑 Очистить график', callback_data='clear_chart_bt'),
+        ],
+        [InlineKeyboardButton(text='🔴 Выключить бота', callback_data='disable_bot')],
+    ]
 )
 
 admin_keyboard_on = InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text='📄 Логи', callback_data='logs_bt'),
-                         InlineKeyboardButton(text='⚙️ Конфиг', callback_data='config_bt')],
-                         [InlineKeyboardButton(text='🗓 Баны', callback_data='bans_bt'),
-                          InlineKeyboardButton(text='📋 Часы', callback_data='hours_bt')],
-                         [InlineKeyboardButton(text='⛔️ Бан', callback_data='ban_bt'),
-                        InlineKeyboardButton(text='✅ Разбан', callback_data='unban_bt')],
-                        #[InlineKeyboardButton(text='👥 Пользователи сейчас', callback_data='users_now_')],
-                        [InlineKeyboardButton(text=f'🗑 Очистить логи', callback_data='clear_logs')],
-                        [InlineKeyboardButton(text=f'🗑 Очистить график', callback_data='clear_chart')],
-                        [InlineKeyboardButton(text=f'🟢 Включить бота', callback_data='enable_bot')]]
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text='📊 За месяц', callback_data='days_chart_bt'),
+            InlineKeyboardButton(text='📊 Почасово', callback_data='hours_chart_bt'),
+        ],
+        [
+            InlineKeyboardButton(text='📄 Логи', callback_data='logs_bt'),
+            InlineKeyboardButton(text='⚙️ Конфиг', callback_data='config_bt'),
+        ],
+        [
+            InlineKeyboardButton(text='🗓 Баны', callback_data='bans_bt'),
+            InlineKeyboardButton(text='📋 Часы', callback_data='hours_bt'),
+        ],
+        [
+            InlineKeyboardButton(text='⛔️ Бан', callback_data='ban_bt'),
+            InlineKeyboardButton(text='✅ Разбан', callback_data='unban_bt'),
+        ],
+        [
+            InlineKeyboardButton(text='🗑 Очистить логи', callback_data='clear_logs_bt'),
+            InlineKeyboardButton(text='🗑 Очистить график', callback_data='clear_chart_bt'),
+        ],
+        [InlineKeyboardButton(text='🟢 Включить бота', callback_data='enable_bot')],
+    ]
 )
-    # Логи 
-    # Конфиг
-    # Бан
-    # Разбан
-    # Отправить файл
-    # Юзеры в данный момент
-    # Вкл/Выкл
   
 chanel_ban_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[[InlineKeyboardButton(text='❌ Отмена', callback_data='cancel_ban')]]
 )
 
-moving_keyboard_buttons = InlineKeyboardMarkup(
-    inline_keyboard=[[InlineKeyboardButton(text='<', callback_data='previos_ver'), InlineKeyboardButton(text='>', callback_data='next_ver')]]
-)  
+
+#moving_keyboard_buttons = InlineKeyboardMarkup(
+#    inline_keyboard=[[InlineKeyboardButton(text='<', callback_data='previos_ver'), InlineKeyboardButton(text='>', callback_data='next_ver')]]
+#)  

@@ -1,4 +1,4 @@
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile
 from aiogram import F, types, Router
 from datetime import datetime
 from dotenv import load_dotenv
@@ -149,27 +149,27 @@ async def send_logs_bt(callback: CallbackQuery):
         caption=f'Логи бота за {now_time}, requests - {async_func.request_counter}') # Отправка логов по кнопке
 
 @router.callback_query(IsAdmin(), F.data == ('config_bt')) # Отправка конфига по кнопки с панели администратора
-async def send_logs_bt(callback: CallbackQuery):
+async def send_config_bt(callback: CallbackQuery):
     await callback.answer() # Закрываем часики
     await callback.message.answer_document(
         document=types.FSInputFile(path='user_settings.json'), 
         caption=f'Конфиг пользователей') # Отправка конфига по кнопке
     
-@router.callback_query(IsAdmin(), F.data == 'bans_bt') 
+@router.callback_query(IsAdmin(), F.data == 'bans_bt') # Отправка файла забанненых с панели администратора
 async def send_bans_bt(callback: CallbackQuery):
     await callback.answer() # Закрываем часики
     await callback.message.answer_document(
         document=types.FSInputFile(path='banned_users.json'), 
         caption=f'Файл забаненных') 
     
-@router.callback_query(IsAdmin(), F.data == 'hours_bt') 
-async def send_bans_bt(callback: CallbackQuery):
+@router.callback_query(IsAdmin(), F.data == 'hours_bt') # Отправка файла часовых запросов с панели администратора
+async def send_hours_bt(callback: CallbackQuery):
     await callback.answer() # Закрываем часики
     await callback.message.answer_document(
         document=types.FSInputFile(path='hour_requests.json'), 
         caption=f'Часовые запросы') 
     
-@router.callback_query(IsAdmin(), F.data == 'clear_logs') # Удаление логов по кнопке
+@router.callback_query(IsAdmin(), F.data == 'clear_logs_bt') # Удаление логов по кнопке
 async def clear_logs(callback: CallbackQuery):
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
     await callback.answer()
@@ -193,8 +193,9 @@ async def clear_logs(callback: CallbackQuery):
     except Exception as e:
         await callback.message.answer(f'❌ Ошибка: {e}')
 
-@router.callback_query(IsAdmin(), F.data == 'clear_chart') # Удаление логов по кнопке
+@router.callback_query(IsAdmin(), F.data == 'clear_chart_bt') # Очистка файла часовых запросов
 async def clear_chart(callback: CallbackQuery):
+    
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
     await callback.answer()
     
@@ -214,6 +215,25 @@ async def clear_chart(callback: CallbackQuery):
         await callback.message.answer('✅ Файл с часовыми запросами удален')
     except Exception as e:
         await callback.message.answer(f'❌ Ошибка: {e}')
+
+@router.callback_query(IsAdmin(), F.data == 'hours_chart_bt') # Очистка файла часовых запросов
+async def send_hours_chart(callback: CallbackQuery):
+    
+    common_func.make_chart() # Создание графика из json
+    
+    photo = FSInputFile('chart.png')
+    await callback.message.answer_photo(photo=photo) # Отправка
+    await callback.answer()
+
+@router.callback_query(IsAdmin(), F.data == 'days_chart_bt') # Очистка файла часовых запросов
+async def send_days_chart(callback: CallbackQuery):
+    
+    common_func.save_day_requests() # Создание графика из json
+    
+    photo = FSInputFile('day_chart.png')
+    await callback.message.answer_photo(photo=photo) # Отправка
+    await callback.answer()
+
 
 @router.callback_query(IsAdmin(), F.data.startswith('ban_bt')) # Если Админ и ban_
 async def ban_user(callback: CallbackQuery, state: FSMContext):
