@@ -25,7 +25,7 @@ SECRET_WORD_CONFIGS = os.getenv('SECRET_WORD_CONFIGS')
 API_BASE_URL = os.getenv('API_BASE_URL')
 SECRET_ADMIN_WORD = os.getenv('SECRET_ADMIN_WORD')
 SECRET_CHART_WORD = os.getenv('SECRET_CHART_WORD')
-SECRET__DAY_CHART_WORD = os.getenv('SECRET__DAY_CHART_WORD')
+SECRET_DAY_CHART_WORD = os.getenv('SECRET_DAY_CHART_WORD')
 
 class TeacherState(StatesGroup):
     waiting_name = State()
@@ -164,7 +164,31 @@ async def ansewer(message: types.Message):
     
 @router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_ADMIN_WORD.lower())
 async def admin_panel(message: types.Message):
-    await message.answer('Панель администратора:', reply_markup=inline.admin_keyboard_off)
+
+    current_date = datetime.now().strftime('%d.%m')
+    current_hour = datetime.now().strftime('%d.%m - %H') # Текущий час + дата
+
+    hour = 0
+    day = 0
+
+    with open('hour_requests.json', 'r', encoding='utf-8') as f:
+        hour_requests = json.load(f)
+
+    for item in hour_requests:
+        date_path, hour_path = item['date'].split(' - ')
+
+        if item['date'] == current_hour:
+            hour = item['hour_requests']
+
+        if date_path == current_date:
+            day += item['hour_requests']
+
+    text = ('🏢 Панелька администратора:\n'
+    '━━━━━━━━━━━━━━━\n'
+    f'⏱ Час: {hour}\n'
+    f'📅 Сегодня: {day}\n')
+
+    await message.answer(text, reply_markup=inline.admin_keyboard_off)
 
 @router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_WORD_LOGS.lower())
 async def send_logs(message: types.Message):
@@ -186,7 +210,7 @@ async def send_chart(message: types.Message):
     photo = FSInputFile('chart.png')
     await message.answer_photo(photo=photo) # Отправка
     await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET__DAY_CHART_WORD.lower())
+@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_DAY_CHART_WORD.lower())
 async def send_chart(message: types.Message):
     common_func.save_day_requests()  # Создание графика из json
     
