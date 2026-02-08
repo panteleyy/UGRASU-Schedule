@@ -54,9 +54,9 @@ async def start_message(message: types.Message, command: Command):
 
     if command.args:
 
-        tommorow_date = datetime.today().date() + timedelta(days=1)
-        day, month = common_func.date_to_text(tommorow_date)
-        weekday = common_func.get_weekday(tommorow_date)
+        today_date = datetime.today().date()
+        day, month = common_func.date_to_text(today_date)
+        weekday = common_func.get_weekday(today_date)
 
         if command.args and command.args.startswith('teacher_'):
             await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
@@ -70,11 +70,11 @@ async def start_message(message: types.Message, command: Command):
             await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
             url_id = command.args.replace('cab_', 'auditoriumOid=')
 
-            group, auditorium_id = common_func.get_cabinet_info(None,int(url_id.replace('auditoriumOid=', '')))
+            group, auditorium_id = common_func.get_cabinet_info(None, int(url_id.replace('auditoriumOid=', '')))
             group_name = 'Кабинет: ' + group
                 
         await async_func.shedule_by_date_link(message, 
-                                                tommorow_date, 
+                                                today_date, 
                                                 day, 
                                                 month, 
                                                 weekday, 
@@ -234,11 +234,16 @@ async def admin_panel(message: types.Message):
         if usr:
             users += 1
 
-        last_request_time = datetime.strptime(user_settings[usr]['last_request'], '%d.%m.%Y - %H:%M:%S')
-        time_diff = datetime.now() - last_request_time
+        if 'last_request' in user_settings[usr]:
+            try:
+                last_request_time = datetime.strptime(user_settings[usr]['last_request'], '%d.%m.%Y - %H:%M:%S')
+                time_diff = datetime.now() - last_request_time
+                if time_diff <= timedelta(days=3):
+                    active_users += 1
+            except (ValueError, TypeError):
+                
+                continue
 
-        if time_diff <= timedelta(days=3):
-            active_users += 1 
 
     text = ('🏢 Панелька администратора:\n'
     '━━━━━━━━━━━━━━━\n'
