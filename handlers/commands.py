@@ -76,7 +76,6 @@ async def start_message(message: types.Message, command: Command):
                                               group_name)
     else:
 
-
         update_text = (
         '👋 Привет! Это бот для просмотра расписания занятий в ЮГУ\n\n'
         '👥 Для того что бы посмотреть расписание нужно выбрать группу или преподавателя: /group или /teacher\n\n'
@@ -88,11 +87,11 @@ async def start_message(message: types.Message, command: Command):
 
         await message.answer(update_text, parse_mode=ParseMode.HTML, reply_markup=reply.keyboard_look)
 
-@router.message(Command('theme'))
+@router.message(Command('theme')) # ВЫБОР ТЕМЫ
 async def start_message(message: types.Message):
     await message.answer('Выбери тему:', reply_markup=inline.themes_keyboard())
 
-@router.message(Command('info'))
+@router.message(Command('info')) #
 async def group_command(message: types.Message):
     text = (
         "⚙️ Команды бота\n\n"
@@ -108,9 +107,19 @@ async def group_command(message: types.Message):
 
     await message.answer(text, parse_mode=ParseMode.HTML, reply_markup=reply.keyboard_look)
 
-@router.message(Command('group'))
+@router.message(Command('group')) # ВЫБОР ГРУППЫ
 async def group_command(message: types.Message):
     await message.answer('Выбери факультет:', reply_markup=common_func.find_faculties())
+
+@router.message(Command('changelog')) # ЧЕЙНДЖОЛОГ
+async def changelog(message: types.Message):
+    await message.answer(
+    "Версия 1.1 «неРасписания ЮГУ» уже тут! 🚀\n\n"
+    "👨‍🏫 Добавлена возможность смотреть расписание преподавателей: /teacher\n\n"
+    "🔧 Исправлены ошибки, повышена стабильность работы бота\n\n"
+    "Если бот не отвечает писать: @panteleeyy\nСпасибо, что пользуетесь ботом!")
+
+### РАСПИСАНИЕ НА СЕГОДНЯ ###
 
 @router.message(lambda message: 'расписание на сегодня' == message.text.lower())
 async def ansewer(message: types.Message):
@@ -131,6 +140,8 @@ async def ansewer(message: types.Message):
 
     await async_func.shedule_by_date(message, today_date, day, month, weekday, user_id, url_id)
 
+### РАСПИСАНИЕ НА ЗАВТРА ###
+
 @router.message(lambda message: 'расписание на завтра' == message.text.lower())
 async def ansewer(message: types.Message):
     user_id = str(message.from_user.id)
@@ -149,7 +160,9 @@ async def ansewer(message: types.Message):
 
     await async_func.shedule_by_date(message, tommorow_date, day, month, weekday, user_id, url_id)
 
-@router.message(lambda message: 'выбрать дату' == message.text.lower())
+### # РАСПИСАНИЕ ПО ВЫБРАННОЙ ДАТЕ ###
+
+@router.message(lambda message: 'выбрать дату' == message.text.lower()) 
 async def ansewer(message: types.Message):
     user_id = str(message.from_user.id)
 
@@ -180,16 +193,9 @@ async def answer(message: types.Message):
     url_id = common_func.user_configs.get(user_id, {}).get('url_id')
 
     await async_func.shedule_by_date(message, user_date, day, month, weekday, user_id, url_id)
+    
+### АДМИН ПАНЕЛЬКА ###
 
-@router.message(Command('changelog'))
-async def ansewer(message: types.Message):
-    await message.answer(
-    "Версия 1.1 «неРасписания ЮГУ» уже тут! 🚀\n\n"
-    "👨‍🏫 Добавлена возможность смотреть расписание преподавателей: /teacher\n\n"
-    "🔧 Исправлены ошибки, повышена стабильность работы бота\n\n"
-    "Если бот не отвечает писать: @panteleeyy\nСпасибо, что пользуетесь ботом!", reply_markup=inline.moving_keyboard_buttons)
-    
-    
 @router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_ADMIN_WORD.lower())
 async def admin_panel(message: types.Message):
 
@@ -222,7 +228,6 @@ async def admin_panel(message: types.Message):
 
         last_request_time = datetime.strptime(user_settings[usr]['last_request'], '%d.%m.%Y - %H:%M:%S')
         time_diff = datetime.now() - last_request_time
-        print(time_diff)
 
         if time_diff <= timedelta(days=3):
             active_users += 1 
@@ -236,27 +241,31 @@ async def admin_panel(message: types.Message):
 
     await message.answer(text, reply_markup=inline.admin_keyboard_off)
 
-@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_WORD_LOGS.lower())
+### КОМАНДЫ ДЛЯ ПОЛУЧЕНИЯ ФАЙЛОВ И ГРАФИКОВ, АДМИНИСТРАТОРОМ ###
+
+@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_WORD_LOGS.lower()) # Получение логов
 async def send_logs(message: types.Message):
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
 
     await message.answer_document(document=types.FSInputFile(path='logs.json'), caption=f'Логи бота за {now_time}, requests - {async_func.request_counter}')
     await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
-@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_WORD_CONFIGS.lower())
+@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_WORD_CONFIGS.lower()) # Получение конфига
 async def send_config(message: types.Message):
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
 
     await message.answer_document(document=types.FSInputFile(path='user_settings.json'), caption=f'Конфиг пользователей за {now_time}')
     await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_CHART_WORD.lower())
+
+@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_CHART_WORD.lower()) # Получение графика по часам
 async def send_chart(message: types.Message):
     common_func.make_chart() # Создание графика из json
     
     photo = FSInputFile('chart.png')
     await message.answer_photo(photo=photo) # Отправка
     await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_DAY_CHART_WORD.lower())
+
+@router.message(lambda msg: msg.from_user.id == ADMIN_ID and msg.text.lower() == SECRET_DAY_CHART_WORD.lower()) # Получение графика по дням
 async def send_chart(message: types.Message):
     common_func.save_day_requests()  # Создание графика из json
     
@@ -265,8 +274,9 @@ async def send_chart(message: types.Message):
     await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 
+### ВЫБОР ПРЕПОДАВАТЕЛЯ ###
 
-@router.message(Command('teacher'))
+@router.message(Command('teacher')) 
 async def teachers(message: Message, state: FSMContext):
     await state.set_state(TeacherState.waiting_name)
     await message.answer(
