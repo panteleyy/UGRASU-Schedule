@@ -137,12 +137,6 @@ async def shedule_by_date_link(message, date, day, month, weekday, user_id, url_
 
         return
     
-
-    #user = common_func.user_configs.get(user_id, {}).get('who')
-
-
-    #group_name, facultyOid = common_func.get_group_name(message, group_id) # Получаем имя группы или преподавателя и номер факультета
-    
     user_theme = common_func.user_configs.get(user_id, {}).get('theme')
 
     text_shedule = f'📅Расписание на {day} {month}, {weekday} \n{group_name}\n'
@@ -180,3 +174,32 @@ async def shedule_by_date_link(message, date, day, month, weekday, user_id, url_
          text_shedule += '————————————'
     
     await message.answer(text_shedule, parse_mode='Markdown', reply_markup=reply.keyboard_look)
+
+    global request_counter # Cчетчк запросов
+    request_counter += 1   
+    
+    common_func.save_hour_requests() # Запись в json
+    common_func.last_request_time(message) # Запись времени последнего запроса в конфиг
+
+    # Запись и сохранение логов
+    now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
+    log_text = {
+        'date_time': now_time,
+        'username': message.from_user.username,
+        'name': message.from_user.full_name,
+        'id': message.from_user.id,
+        'group_name': group_name,
+        'selected_date': f'{day} {month} {weekday}',
+        'requests_count': request_counter
+    }
+
+    try:
+        with open('logs.json', 'r', encoding='utf-8') as file:
+            log_arr = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        log_arr = []
+    
+    log_arr.append(log_text)
+    
+    with open('logs.json', 'w', encoding='utf-8') as logs_file:
+        json.dump(log_arr, logs_file, ensure_ascii=False, indent=4)
