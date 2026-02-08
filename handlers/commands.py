@@ -55,12 +55,10 @@ async def start_message(message: types.Message, command: Command):
 
     if command.args and command.args.startswith('teacher_'):
         url_id = command.args.replace('teacher_', 'lecturerOid=')
-        print(url_id)
 
         for t in teachers_file.teacher_file:
             if t["lecturerOid"] == int(url_id.replace('lecturerOid=', '')):
                 group_name = t['fio']
-                print(group_name)
 
         tommorow_date = datetime.today().date() + timedelta(days=1)
         day, month = common_func.date_to_text(tommorow_date)
