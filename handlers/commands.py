@@ -75,6 +75,28 @@ async def start_message(message: types.Message, command: Command):
                                               user_id, 
                                               url_id,  
                                               group_name)
+    elif command.args and command.args.startswith('cab_'):
+        
+        url_id = command.args.replace('cab_', 'auditoriumOid=')
+        print(url_id)
+
+        group_name = common_func.get_cabinet_name(int(url_id.replace('auditoriumOid=', '')))
+
+        tommorow_date = datetime.today().date() + timedelta(days=1)
+        day, month = common_func.date_to_text(tommorow_date)
+        weekday = common_func.get_weekday(tommorow_date)
+            
+
+
+        await async_func.shedule_by_date_link(message, 
+                                              tommorow_date, 
+                                              day, 
+                                              month, 
+                                              weekday, 
+                                              user_id, 
+                                              url_id,  
+                                              group_name)
+
     else:
 
         update_text = (

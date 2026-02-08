@@ -17,6 +17,8 @@ def formate_lessons(discipline):
 def default_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group, url_id=None):
     
     teacher_id = teachers_file.get_teacher_id(common_func.short_name(lecturer))
+    auditorium_id = common_func.get_cabinet_id(auditorium)
+    print(auditorium_id)
 
     theme_text = "————————————\n"
     theme_text += f"*Пара {lesson_number} | {begin_lessson}-{end_lesson}*\n"
@@ -25,7 +27,7 @@ def default_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer
     if subgroup:
         theme_text += f"🔹Подгруппа: {subgroup[-1]}\n"
 
-    theme_text += f"🏫{auditorium}\n"
+    theme_text += f"[🏫{auditorium}]({BOT_LINK}start=cab_{auditorium_id})\n"
 
     if user == 'student':
         #theme_text += f'🎓{lecturer}\n'

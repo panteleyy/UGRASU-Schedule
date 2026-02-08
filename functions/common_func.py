@@ -260,3 +260,36 @@ def last_request_time(message):
     })
 
     save_configs(user_configs)
+
+def get_cabinet_id(name):
+
+    url = f'{API_BASE_URL}/auditoriums'
+
+    headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0",
+                "Accept": "application/json, text/plain, */*",
+                "Origin": "https://itport.ugrasu.ru",
+                "Referer": "https://itport.ugrasu.ru/",
+    }
+    response = requests.get(url, headers=headers)
+    auditoriums = response.json()
+
+    for cab in auditoriums:
+        if cab['name'] == name:
+            return cab['auditoriumOid']
+        
+def get_cabinet_name(id):
+    url = f'{API_BASE_URL}/auditoriums'
+
+    headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0",
+                "Accept": "application/json, text/plain, */*",
+                "Origin": "https://itport.ugrasu.ru",
+                "Referer": "https://itport.ugrasu.ru/",
+    }
+    response = requests.get(url, headers=headers)
+    auditoriums = response.json()
+
+    for cab in auditoriums:
+        if cab['auditoriumOid'] == id: 
+            return cab['name']
