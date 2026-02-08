@@ -38,53 +38,64 @@ def default_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer
 
     return theme_text
 
-def old_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group):
+def old_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group, url_id=None):
+
+    teacher_id = teachers_file.get_teacher_id(common_func.short_name(lecturer))
+
     theme_text = '\n'
     theme_text += f'📖{formate_lessons(discipline)} - {short_kndwork(kind_of_work)}\n'
     if subgroup:
         theme_text += f"🔹Подгруппа: {subgroup[-1]}\n"
+
     theme_text += f'🕰{begin_lessson} - {end_lesson}\n'
+
     if user == 'student':
-        theme_text += f'👤{lecturer}\n'
-    theme_text += f'🚪{auditorium}\n'
-    if user == 'teacher':
+        theme_text += f'[👤{lecturer}]({BOT_LINK}start=teacher_{teacher_id})\n'
+    else:
         if groups is None:
             theme_text += f'👥Группа: {group}\n'
         else:
             theme_text += f'👥Группы: {groups}\n'
+
+    theme_text += f'🚪{auditorium}\n'
+
     return theme_text
 
-def standart_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group):
+def standart_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group, url_id=None):
+    teacher_id = teachers_file.get_teacher_id(common_func.short_name(lecturer))
     theme_text = '\n'
     theme_text += f'🕑{begin_lessson} - {end_lesson}\n'
     theme_text += f'📚{formate_lessons(discipline)} - {short_kndwork(kind_of_work)}\n'
     if subgroup:
         theme_text += f"🔹Подгруппа: {subgroup[-1]}\n"
     theme_text += f'🏫{auditorium}\n'
-    if user == 'teacher':
+    
+    if user == 'student':
+        theme_text += f'[👤{lecturer}]({BOT_LINK}start=teacher_{teacher_id})\n'
+    else:
         if groups is None:
             theme_text += f'👥Группа: {group}\n'
         else:
             theme_text += f'👥Группы: {groups}\n'
-    if user == 'student':
-        theme_text += f'👤{common_func.short_name(lecturer)}\n'
 
     return theme_text
 
-def marker_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group):
+def marker_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group, url_id=None):
+    teacher_id = teachers_file.get_teacher_id(common_func.short_name(lecturer))
     theme_text = '\n'
     theme_text += f'{const_dictionary.COLORED_KIND_OF_WORK.get(kind_of_work)} {formate_lessons(discipline)}\n'
     if subgroup:
         theme_text += f"🔹Подгруппа: {subgroup[-1]}\n"
     theme_text += f'*•* {begin_lessson}-{end_lesson}\n'
     theme_text += f'*•* {auditorium}\n'
-    if user == 'teacher':
+
+    if user == 'student':
+        theme_text += f'*•* [{lecturer}]({BOT_LINK}start=teacher_{teacher_id})\n'
+    else:
         if groups is None:
             theme_text += f'*•* Группа: {group}\n'
         else:
             theme_text += f'*•* Группы: {groups}\n'
-    if user == 'student':
-        theme_text += f'*•* {common_func.short_name(lecturer)}\n'
     
     return theme_text
 
