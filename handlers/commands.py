@@ -1,4 +1,4 @@
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram import types
 from datetime import datetime, timedelta
@@ -48,7 +48,25 @@ class BanMiddleware(BaseMiddleware):
         return await handler(event, data)
 
 @router.message(Command('start'))
-async def start_message(message: types.Message):
+async def start_message(message: types.Message, command: Command):
+
+    user_id = str(message.from_user.id)
+
+
+    if command.args and command.args.startswith('teacher_'):
+        url_id = command.args.replace('teacher_', 'lecturerOid=')
+        print(url_id)
+
+    today_date = datetime.today().date()
+    day, month = common_func.date_to_text(today_date)
+    weekday = common_func.get_weekday(today_date)
+
+
+
+    await async_func.shedule_by_date(message, today_date, day, month, weekday, user_id, url_id)
+
+
+
     update_text = (
     '👋 Привет! Это бот для просмотра расписания занятий в ЮГУ\n\n'
     '👥 Для того что бы посмотреть расписание нужно выбрать группу или преподавателя: /group или /teacher\n\n'
@@ -59,6 +77,8 @@ async def start_message(message: types.Message):
     'ℹ️ Больше информации: /info')
 
     await message.answer(update_text, parse_mode=ParseMode.HTML, reply_markup=reply.keyboard_look)
+
+    
 
 @router.message(Command('theme'))
 async def start_message(message: types.Message):

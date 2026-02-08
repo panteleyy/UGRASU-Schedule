@@ -38,3 +38,8 @@ def get_teacheroid(name):
 
     return None
 
+def get_teacher_id(name):
+    for t in teacher_file:
+        if name == t['shortFIO']:
+            return t['lecturerOid']
+
