@@ -52,50 +52,37 @@ async def start_message(message: types.Message, command: Command):
 
     user_id = str(message.from_user.id)
 
-    
-    if command.args and command.args.startswith('teacher_'):
-        await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-        url_id = command.args.replace('teacher_', 'lecturerOid=')
-
-        for t in teachers_file.teacher_file:
-            if t["lecturerOid"] == int(url_id.replace('lecturerOid=', '')):
-                group_name = t['fio']
+    if command.args:
 
         tommorow_date = datetime.today().date() + timedelta(days=1)
         day, month = common_func.date_to_text(tommorow_date)
         weekday = common_func.get_weekday(tommorow_date)
-            
 
+        if command.args and command.args.startswith('teacher_'):
+            await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+            url_id = command.args.replace('teacher_', 'lecturerOid=')
 
+            for t in teachers_file.teacher_file:
+                if t["lecturerOid"] == int(url_id.replace('lecturerOid=', '')):
+                    group_name = t['fio']
+
+        elif command.args and command.args.startswith('cab_'):
+            await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+            print(command.args)
+            url_id = command.args.replace('cab_', 'auditoriumOid=')
+            print(url_id)
+
+            group_name, auditorium_id = common_func.get_cabinet_info(None,int(url_id.replace('auditoriumOid=', '')))
+            #print(group_name, auditorium_id)
+                
         await async_func.shedule_by_date_link(message, 
-                                              tommorow_date, 
-                                              day, 
-                                              month, 
-                                              weekday, 
-                                              user_id, 
-                                              url_id,  
-                                              group_name)
-    elif command.args and command.args.startswith('cab_'):
-        
-        url_id = command.args.replace('cab_', 'auditoriumOid=')
-        print(url_id)
-
-        group_name = common_func.get_cabinet_name(int(url_id.replace('auditoriumOid=', '')))
-
-        tommorow_date = datetime.today().date() + timedelta(days=1)
-        day, month = common_func.date_to_text(tommorow_date)
-        weekday = common_func.get_weekday(tommorow_date)
-            
-
-
-        await async_func.shedule_by_date_link(message, 
-                                              tommorow_date, 
-                                              day, 
-                                              month, 
-                                              weekday, 
-                                              user_id, 
-                                              url_id,  
-                                              group_name)
+                                                tommorow_date, 
+                                                day, 
+                                                month, 
+                                                weekday, 
+                                                user_id, 
+                                                url_id,  
+                                                group_name)
 
     else:
 
