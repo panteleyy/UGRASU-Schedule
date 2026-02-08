@@ -91,7 +91,7 @@ async def start_message(message: types.Message, command: Command):
 async def start_message(message: types.Message):
     await message.answer('Выбери тему:', reply_markup=inline.themes_keyboard())
 
-@router.message(Command('info')) #
+@router.message(Command('info')) # ИНФОРМАЦИЯ О БОТЕ
 async def group_command(message: types.Message):
     text = (
         "⚙️ Команды бота\n\n"
