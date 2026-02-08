@@ -1,6 +1,12 @@
 from functions import common_func
 from dictionary import const_dictionary
+from dotenv import load_dotenv
+import os
 
+from functions import teachers_file, common_func
+
+load_dotenv()
+BOT_LINK = os.getenv('BOT_LINK')
 
 def short_kndwork(kind_of_work):
     return 'Практическое занятие' if kind_of_work == 'Практические (семинарские занятия)' else kind_of_work
@@ -8,7 +14,10 @@ def short_kndwork(kind_of_work):
 def formate_lessons(discipline):
     return const_dictionary.SUBJECTS.get(discipline, discipline)
 
-def default_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group):
+def default_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group, url_id=None):
+    
+    teacher_id = teachers_file.get_teacher_id(common_func.short_name(lecturer))
+
     theme_text = "————————————\n"
     theme_text += f"*Пара {lesson_number} | {begin_lessson}-{end_lesson}*\n"
     theme_text += f"📚{formate_lessons(discipline)} - {short_kndwork(kind_of_work)}\n"
@@ -18,15 +27,17 @@ def default_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer
 
     theme_text += f"🏫{auditorium}\n"
 
-    if user == 'teacher':
+    if user == 'student':
+        #theme_text += f'🎓{lecturer}\n'
+        theme_text += f'[🎓{lecturer}]({BOT_LINK}start=teacher_{teacher_id})\n'
+    else:
         if groups is None:
             theme_text += f'👥Группа: {group}\n'
         else:
             theme_text += f'👥Группы: {groups}\n'
-    if user == 'student':
-        theme_text += f'🎓{lecturer}\n'
 
     return theme_text
+
 def old_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group):
     theme_text = '\n'
     theme_text += f'📖{formate_lessons(discipline)} - {short_kndwork(kind_of_work)}\n'

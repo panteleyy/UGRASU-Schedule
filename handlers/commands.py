@@ -57,28 +57,38 @@ async def start_message(message: types.Message, command: Command):
         url_id = command.args.replace('teacher_', 'lecturerOid=')
         print(url_id)
 
-    today_date = datetime.today().date()
-    day, month = common_func.date_to_text(today_date)
-    weekday = common_func.get_weekday(today_date)
+        for t in teachers_file.teacher_file:
+            if t["lecturerOid"] == int(url_id.replace('lecturerOid=', '')):
+                group_name = t['fio']
+                print(group_name)
+
+        tommorow_date = datetime.today().date() + timedelta(days=1)
+        day, month = common_func.date_to_text(tommorow_date)
+        weekday = common_func.get_weekday(tommorow_date)
+            
 
 
+        await async_func.shedule_by_date_link(message, 
+                                              tommorow_date, 
+                                              day, 
+                                              month, 
+                                              weekday, 
+                                              user_id, 
+                                              url_id,  
+                                              group_name)
+    else:
 
-    await async_func.shedule_by_date(message, today_date, day, month, weekday, user_id, url_id)
 
+        update_text = (
+        '👋 Привет! Это бот для просмотра расписания занятий в ЮГУ\n\n'
+        '👥 Для того что бы посмотреть расписание нужно выбрать группу или преподавателя: /group или /teacher\n\n'
+        '🎨 Так же можно изменить тему отабражения расписания: /theme\n\n' \
+        "<blockquote>"
+        "Бот разработан студентом и не имеет официального отношения к ЮГУ."
+        "</blockquote>\n\n"
+        'ℹ️ Больше информации: /info')
 
-
-    update_text = (
-    '👋 Привет! Это бот для просмотра расписания занятий в ЮГУ\n\n'
-    '👥 Для того что бы посмотреть расписание нужно выбрать группу или преподавателя: /group или /teacher\n\n'
-    '🎨 Так же можно изменить тему отабражения расписания: /theme\n\n' \
-    "<blockquote>"
-    "Бот разработан студентом и не имеет официального отношения к ЮГУ."
-    "</blockquote>\n\n"
-    'ℹ️ Больше информации: /info')
-
-    await message.answer(update_text, parse_mode=ParseMode.HTML, reply_markup=reply.keyboard_look)
-
-    
+        await message.answer(update_text, parse_mode=ParseMode.HTML, reply_markup=reply.keyboard_look)
 
 @router.message(Command('theme'))
 async def start_message(message: types.Message):
