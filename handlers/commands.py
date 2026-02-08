@@ -52,8 +52,9 @@ async def start_message(message: types.Message, command: Command):
 
     user_id = str(message.from_user.id)
 
-
+    
     if command.args and command.args.startswith('teacher_'):
+        await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
         url_id = command.args.replace('teacher_', 'lecturerOid=')
 
         for t in teachers_file.teacher_file:
