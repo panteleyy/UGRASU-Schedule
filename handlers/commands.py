@@ -68,12 +68,10 @@ async def start_message(message: types.Message, command: Command):
 
         elif command.args and command.args.startswith('cab_'):
             await message.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-            print(command.args)
             url_id = command.args.replace('cab_', 'auditoriumOid=')
-            print(url_id)
 
-            group_name, auditorium_id = common_func.get_cabinet_info(None,int(url_id.replace('auditoriumOid=', '')))
-            #print(group_name, auditorium_id)
+            group, auditorium_id = common_func.get_cabinet_info(None,int(url_id.replace('auditoriumOid=', '')))
+            group_name = 'Кабинет: ' + group
                 
         await async_func.shedule_by_date_link(message, 
                                                 tommorow_date, 

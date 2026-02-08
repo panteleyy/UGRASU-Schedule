@@ -158,7 +158,7 @@ async def shedule_by_date_link(message, date, day, month, weekday, user_id, url_
         
         text_shedule += theme_func(lesson_number, 
                                    begin_lessson, 
-                                   end_lesson, 
+                                   end_lesson,  
                                    auditorium, 
                                    lecturer, 
                                    discipline, 
