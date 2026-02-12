@@ -74,7 +74,7 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
     if user_theme == 'default':
          text_shedule += '————————————'
     
-    await message.answer(text_shedule, parse_mode='Markdown', reply_markup=reply.keyboard_look, disable_web_page_preview=True) # Отправляем расписание
+    await message.answer(text_shedule, parse_mode='HTML', reply_markup=reply.keyboard_look, disable_web_page_preview=True) # Отправляем расписание
 
     global request_counter # Cчетчк запросов
     request_counter += 1   

@@ -59,3 +59,74 @@ COLORED_KIND_OF_WORK = {
     'Внеаудиторная ': '⚪️',
     'Учебные практики (О)': '⚪️'
 }
+
+
+PRACTICAL_EMOJI = {
+    1: '<tg-emoji emoji-id="5219942301953988098">1️⃣</tg-emoji>',
+    2: '<tg-emoji emoji-id="5220165013188153449">2️⃣</tg-emoji>',
+    3: '<tg-emoji emoji-id="5220066598307530514">3️⃣</tg-emoji>',
+    4: '<tg-emoji emoji-id="5219946794489777249">4️⃣</tg-emoji>',
+    5: '<tg-emoji emoji-id="5220028325853958461">5️⃣</tg-emoji>',
+    6: '<tg-emoji emoji-id="5219949311340613987">6️⃣</tg-emoji>',
+    7: '<tg-emoji emoji-id="5219738664669581747">7️⃣</tg-emoji>'
+}
+
+LECTURE_EMOJI = {
+    1: '<tg-emoji emoji-id="5217885996166712026">1️⃣</tg-emoji>',
+    2: '<tg-emoji emoji-id="5220156208505197077">2️⃣</tg-emoji>',
+    3: '<tg-emoji emoji-id="5219685892406416312">3️⃣</tg-emoji>',
+    4: '<tg-emoji emoji-id="5219791080450462115">4️⃣</tg-emoji>',
+    5: '<tg-emoji emoji-id="5219825221145498995">5️⃣</tg-emoji>',
+    6: '<tg-emoji emoji-id="5219762875400229658">6️⃣</tg-emoji>',
+    7: '<tg-emoji emoji-id="5219875760025669767">7️⃣</tg-emoji>'
+}
+
+EXAM_EMOJI = {
+    1: '<tg-emoji emoji-id="5219888894035662219">1️⃣</tg-emoji>',
+    2: '<tg-emoji emoji-id="5217513012616794562">2️⃣</tg-emoji>',
+    3: '<tg-emoji emoji-id="5219820281933105363">3️⃣</tg-emoji>',
+    4: '<tg-emoji emoji-id="5219781275040127546">4️⃣</tg-emoji>',
+    5: '<tg-emoji emoji-id="5219974054647205491">5️⃣</tg-emoji>',
+    6: '<tg-emoji emoji-id="5219776365892506693">6️⃣</tg-emoji>',
+    7: '<tg-emoji emoji-id="5220076004285912624">7️⃣</tg-emoji>'
+}
+
+DIFF_EMOJI = {
+    1: '<tg-emoji emoji-id="5220104355365039963">1️⃣</tg-emoji>',
+    2: '<tg-emoji emoji-id="5220155834843040719">2️⃣</tg-emoji>',
+    3: '<tg-emoji emoji-id="5219982550092519316">3️⃣</tg-emoji>',
+    4: '<tg-emoji emoji-id="5219843264303110028">4️⃣</tg-emoji>',
+    5: '<tg-emoji emoji-id="5219713448916587029">5️⃣</tg-emoji>',
+    6: '<tg-emoji emoji-id="5219909600072996720">6️⃣</tg-emoji>',
+    7: '<tg-emoji emoji-id="5219884702147580789">7️⃣</tg-emoji>'
+}
+
+PREPARATION_EMOJI = {
+    1: '<tg-emoji emoji-id="5217786559083878815">1️⃣</tg-emoji>',
+    2: '<tg-emoji emoji-id="5219885157414116274">2️⃣</tg-emoji>',
+    3: '<tg-emoji emoji-id="5220145148964410045">3️⃣</tg-emoji>',
+    4: '<tg-emoji emoji-id="5220081059462421779">4️⃣</tg-emoji>',
+    5: '<tg-emoji emoji-id="5219701242619532553">5️⃣</tg-emoji>',
+    6: '<tg-emoji emoji-id="5220131379299260113">6️⃣</tg-emoji>',
+    7: '<tg-emoji emoji-id="5220117575274370920">7️⃣</tg-emoji>'
+}
+
+TALKING_EMOJI = {
+    1: '<tg-emoji emoji-id="5219992948208344077">1️⃣</tg-emoji>',
+    2: '<tg-emoji emoji-id="5219888498898670171">2️⃣</tg-emoji>',
+    3: '<tg-emoji emoji-id="5220156006641735515">3️⃣</tg-emoji>',
+    4: '<tg-emoji emoji-id="5220194708592039924">4️⃣</tg-emoji>',
+    5: '<tg-emoji emoji-id="5220017923443168403">5️⃣</tg-emoji>',
+    6: '<tg-emoji emoji-id="5220141833249660788">6️⃣</tg-emoji>',
+    7: '<tg-emoji emoji-id="5219924297451089408">7️⃣</tg-emoji>'
+}
+
+LAB_EMOJI = {
+    1: '<tg-emoji emoji-id="5219795031820376691">1️⃣</tg-emoji>',
+    2: '<tg-emoji emoji-id="5219725779767693876">2️⃣</tg-emoji>',
+    3: '<tg-emoji emoji-id="5220101705370210869">3️⃣</tg-emoji>',
+    4: '<tg-emoji emoji-id="5219903436794928598">4️⃣</tg-emoji>',
+    5: '<tg-emoji emoji-id="5219792472019871995">5️⃣</tg-emoji>',
+    6: '<tg-emoji emoji-id="5220218184883281052">6️⃣</tg-emoji>',
+    7: '<tg-emoji emoji-id="5219751854514148397">7️⃣</tg-emoji>'
+}

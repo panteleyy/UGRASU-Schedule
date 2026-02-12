@@ -75,9 +75,11 @@ def dates_to_keyboard():
 
         text = f'{day} {month}, {week}'
         if offest == 0:
-            text += '(Сегодня)'
+            #text += '(Сегодня)'
 
-        kb_storage.append(KeyboardButton(text=text))
+            kb_storage.append(KeyboardButton(text=text, style='success'))
+        else:
+            kb_storage.append(KeyboardButton(text=text))
 
         if len(kb_storage) == 2:
             kb_dates.append(kb_storage)
