@@ -7,6 +7,7 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 from aiogram.fsm.storage.memory import MemoryStorage
+import aiohttp
 
 from handlers import commands
 from callbacks import callback
@@ -44,6 +45,19 @@ async def main():
                 print(f'[LOGS ERROR] Ошибка при отправке логов: {e}')
 
             await asyncio.sleep(3600)
+
+    aiohttp_session = aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=15),
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0",
+            "Accept": "application/json, text/plain, */*",
+            "Origin": "https://itport.ugrasu.ru",
+            "Referer": "https://itport.ugrasu.ru/",
+        }
+    )
+
+    bot.aiohttp_session = aiohttp_session
+    print('Сессия запущена')
     
     dp = Dispatcher(storage=MemoryStorage())
     dp.message.middleware(commands.BanMiddleware())
@@ -53,14 +67,15 @@ async def main():
     dp.message.middleware(DisableBotMiddleware())
     dp.callback_query.middleware(DisableBotMiddleware())
 
-    dp.include_routers(
-        commands.router,    
-        callback.router
-    )
-
-
+    dp.include_routers(commands.router, callback.router)
     asyncio.create_task(send_logs())
-    await dp.start_polling(bot)
-    
+
+    try:
+        await dp.start_polling(bot)
+    finally:
+        if not bot.session.closed:
+            await bot.session.close()
+            print('Сессия закрыта')
+
 if __name__ == '__main__':
     asyncio.run(main()) 

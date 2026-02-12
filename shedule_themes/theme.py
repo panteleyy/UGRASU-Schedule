@@ -47,7 +47,7 @@ def default_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer
 
     elif kind_of_work == 'Внеаудиторная ' or kind_of_work == 'Учебные практики (О)':
         theme_text += f"<b>Пара{const_dictionary.TALKING_EMOJI.get(int(lesson_number))}| {begin_lessson}-{end_lesson}</b>\n"
-        
+
     elif kind_of_work == 'Лабораторные работы':
         theme_text += f"<b>Пара{const_dictionary.LAB_EMOJI.get(int(lesson_number))}| {begin_lessson}-{end_lesson}</b>\n"
 
@@ -122,16 +122,16 @@ def marker_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer,
     theme_text += f'{const_dictionary.COLORED_KIND_OF_WORK.get(kind_of_work)} {formate_lessons(discipline)}\n'
     if subgroup:
         theme_text += f"🔹Подгруппа: {subgroup[-1]}\n"
-    theme_text += f'*•* {begin_lessson}-{end_lesson}\n'
-    theme_text += f'*•* {auditorium}\n'
+    theme_text += f'<b>•</b> {begin_lessson}-{end_lesson}\n'
+    theme_text += f'<b>•</b> {auditorium}\n'
 
     if user == 'student':
-        theme_text += f'*•* [{lecturer}]({BOT_LINK}start=teacher_{teacher_id})\n'
+        theme_text += f'<b>•</b> [{lecturer}]({BOT_LINK}start=teacher_{teacher_id})\n'
     else:
         if groups is None:
-            theme_text += f'*•* Группа: {group}\n'
+            theme_text += f'<b>•</b> Группа: {group}\n'
         else:
-            theme_text += f'*•* Группы: {groups}\n'
+            theme_text += f'<b>•</b> Группы: {groups}\n'
     
     return theme_text
 

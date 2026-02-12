@@ -5,6 +5,7 @@ import json
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+import asyncio
 
 from functions import common_func
 from keyboards import reply
@@ -25,25 +26,42 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
         return
     
     url = f'{API_BASE_URL}/lessons?fromdate={date}&todate={date}&{url_id}'
+
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0",
         "Accept": "application/json, text/plain, */*",
         "Origin": "https://itport.ugrasu.ru",
         "Referer": "https://itport.ugrasu.ru/",
     }
-    response = requests.get(url, headers=headers)
-    lessons_file = response.json()
-    lessons_sorted = sorted(lessons_file, key=lambda x: (datetime.strptime(x['date'], '%Y.%m.%d'), x['beginLesson']))
 
-    date_lessons = [
-        l for l in lessons_sorted
-        if datetime.strptime(l["date"], "%Y.%m.%d").date() == date
-    ]
+    #response = requests.get(url, headers=headers)
+    #lessons_file = response.json()
     
-    if not date_lessons:
-        await message.answer(f'{day} {month} занятий нет!', reply_markup=reply.keyboard_look)
+    try:
+        async with message.bot.aiohttp_session.get(url) as response:
+            if response.status != 200:
+                await message.answer(f'⚠️ Ошибка сервера, попробуйте позже')
+                return
 
-        return
+            lessons_file = await response.json()
+            lessons_sorted = sorted(lessons_file, key=lambda x: (datetime.strptime(x['date'], '%Y.%m.%d'), x['beginLesson']))
+
+        date_lessons = [
+            l for l in lessons_sorted
+            if datetime.strptime(l["date"], "%Y.%m.%d").date() == date
+        ]
+        
+        if not date_lessons:
+            await message.answer(f'{day} {month} занятий нет!', reply_markup=reply.keyboard_look)
+
+            return
+        
+    except asyncio.TimeoutError:
+        await message.answer("Сервер расписания не отвечает")
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        await message.answer("Не удалось получить расписание")
+
     user = common_func.user_configs.get(user_id, {}).get('who')
     group_name, facultyOid = common_func.get_group_name(message, group_id) # Получаем имя группы или преподавателя и номер факультета
     
