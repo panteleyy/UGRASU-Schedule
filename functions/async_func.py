@@ -26,16 +26,6 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
         return
     
     url = f'{API_BASE_URL}/lessons?fromdate={date}&todate={date}&{url_id}'
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0",
-        "Accept": "application/json, text/plain, */*",
-        "Origin": "https://itport.ugrasu.ru",
-        "Referer": "https://itport.ugrasu.ru/",
-    }
-
-    #response = requests.get(url, headers=headers)
-    #lessons_file = response.json()
     
     try:
         async with message.bot.aiohttp_session.get(url) as response:
@@ -57,7 +47,7 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
             return
         
     except asyncio.TimeoutError:
-        await message.answer("Сервер расписания не отвечает")
+        await message.answer("Сервер ЮГУ не отвечает")
     except Exception as e:
         print(f"Ошибка: {e}")
         await message.answer("Не удалось получить расписание")
@@ -87,7 +77,18 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
 
         theme_func = theme.themes.get(user_theme, theme.themes.get('default'))
         
-        text_shedule += theme_func(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group, url_id)
+        text_shedule += theme_func(lesson_number,
+                                    begin_lessson,
+                                    end_lesson,
+                                    auditorium,
+                                    lecturer,
+                                    discipline,
+                                    kind_of_work,
+                                    subgroup,
+                                    user,
+                                    groups,
+                                    group,
+                                    url_id)
         
     if user_theme == 'default':
          text_shedule += '————————————'
@@ -128,32 +129,32 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
 
 async def shedule_by_date_link(message, date, day, month, weekday, user_id, url_id, group_name):
 
-    #group_id = common_func.user_configs.get(user_id, {}).get('group_id') # Получаем айди выбранной группы или преподавателя
-
-    #if not group_id: # Проверка на наличе группы
-    #    await message.answer('Сначала выбери группу /group или преподавателя /teacher, а лучше посмотри изменения новой версии /changelog')
-    #    return
-    
     url = f'{API_BASE_URL}/lessons?fromdate={date}&todate={date}&{url_id}'
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0",
-        "Accept": "application/json, text/plain, */*",
-        "Origin": "https://itport.ugrasu.ru",
-        "Referer": "https://itport.ugrasu.ru/",
-    }
-    response = requests.get(url, headers=headers)
-    lessons_file = response.json()
-    lessons_sorted = sorted(lessons_file, key=lambda x: (datetime.strptime(x['date'], '%Y.%m.%d'), x['beginLesson']))
 
-    date_lessons = [
-        l for l in lessons_sorted
-        if datetime.strptime(l["date"], "%Y.%m.%d").date() == date
-    ]
-    
-    if not date_lessons:
-        await message.answer(f'{day} {month} занятий нет!', reply_markup=reply.keyboard_look)
+    try:
+        async with message.bot.aiohttp_session.get(url) as response:
+            if response.status != 200:
+                await message.answer(f'⚠️ Ошибка сервера, попробуйте позже')
+                return
 
-        return
+            lessons_file = await response.json()
+            lessons_sorted = sorted(lessons_file, key=lambda x: (datetime.strptime(x['date'], '%Y.%m.%d'), x['beginLesson']))
+
+        date_lessons = [
+            l for l in lessons_sorted
+            if datetime.strptime(l["date"], "%Y.%m.%d").date() == date
+        ]
+        
+        if not date_lessons:
+            await message.answer(f'{day} {month} занятий нет!', reply_markup=reply.keyboard_look)
+
+            return
+        
+    except asyncio.TimeoutError:
+        await message.answer("Сервер ЮГУ не отвечает")
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        await message.answer("Не удалось получить расписание")
     
     user_theme = common_func.user_configs.get(user_id, {}).get('theme')
 
@@ -191,7 +192,7 @@ async def shedule_by_date_link(message, date, day, month, weekday, user_id, url_
     if user_theme == 'default':
          text_shedule += '————————————'
     
-    await message.answer(text_shedule, parse_mode='Markdown', reply_markup=reply.keyboard_look, disable_web_page_preview=True)
+    await message.answer(text_shedule, parse_mode='HTML', reply_markup=reply.keyboard_look, disable_web_page_preview=True)
 
     global request_counter # Cчетчк запросов
     request_counter += 1   
@@ -202,6 +203,7 @@ async def shedule_by_date_link(message, date, day, month, weekday, user_id, url_
     # Запись и сохранение логов
     now_time = datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
     log_text = {
+        'link_request': 1,
         'date_time': now_time,
         'username': message.from_user.username,
         'name': message.from_user.full_name,
