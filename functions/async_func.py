@@ -10,6 +10,7 @@ import asyncio
 from functions import common_func
 from keyboards import reply
 from shedule_themes import theme
+from functions import teachers_file
 
 
 load_dotenv()
@@ -127,7 +128,26 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
         json.dump(log_arr, logs_file, ensure_ascii=False, indent=4)
 
 
-async def shedule_by_date_link(message, date, day, month, weekday, user_id, url_id, group_name):
+async def shedule_by_date_link(message, date, day, month, weekday, user_id, command_args):
+
+    if command_args and command_args.startswith('cab_'): # command.args --> cab_123
+        request_object, cabinet_id = command_args.split('_') # request_object --> cab, cabinet_id --> 123
+
+        url_id = f'auditoriumOid={cabinet_id}' # auditoriumOid=123
+
+        group, auditorium_id = common_func.get_cabinet_info(None, int(url_id.replace('auditoriumOid=', '')))
+        group_name = 'Кабинет: ' + group
+
+    elif command_args and command_args.startswith('teacher_'):
+
+        request_object, teacher_id = command_args.split('_') # request_object --> teacher, teacher_id --> 123
+
+        url_id = f'lecturerOid={teacher_id}' # lecturerOid=123
+
+        for t in teachers_file.teacher_file:
+            if t ['lecturerOid'] == int(url_id.replace('lecturerOid=', '')):
+                group_name = t['fio']
+                    
 
     url = f'{API_BASE_URL}/lessons?fromdate={date}&todate={date}&{url_id}'
 
@@ -186,7 +206,8 @@ async def shedule_by_date_link(message, date, day, month, weekday, user_id, url_
                                    None,
                                    groups, 
                                    group,
-                                   url_id
+                                   request_object,
+                                   url_id,
                                    )
         
     if user_theme == 'default':

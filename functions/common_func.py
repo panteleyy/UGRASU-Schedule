@@ -285,3 +285,29 @@ def get_cabinet_info(name, auditorium_id):
             if cab['auditoriumOid'] == auditorium_id: 
                 name = cab['name']
     return name, auditorium_id
+
+
+def find_emoji_number(kind_of_work, lesson_number): # kind_of_wordk --> str, lesson_number --> int
+    if kind_of_work == 'Практические (семинарские занятия)':
+        return f"<b>Пара{const_dictionary.PRACTICAL_EMOJI.get(int(lesson_number))}</b>"
+
+    elif kind_of_work == 'Лекция':
+        return f"<b>Пара{const_dictionary.LECTURE_EMOJI.get(int(lesson_number))}</b>"
+    
+    elif kind_of_work == 'Пересдача экзамена' or kind_of_work == 'Экзамены':
+        return f"<b>Пара{const_dictionary.EXAM_EMOJI.get(int(lesson_number))}</b>"
+
+    elif kind_of_work == 'Консультации перед экзаменом':
+        return f"<b>Пара{const_dictionary.PREPARATION_EMOJI.get(int(lesson_number))}</b>"
+
+    elif kind_of_work == 'Пересдача дифференцированного зачета' or kind_of_work == 'Дифференцированный зачет':
+        return f"<b>Пара{const_dictionary.DIFF_EMOJI.get(int(lesson_number))}</b>"
+
+    elif kind_of_work == 'Внеаудиторная ' or kind_of_work == 'Учебные практики (О)':
+        return f"<b>Пара{const_dictionary.TALKING_EMOJI.get(int(lesson_number))}</b>"
+
+    elif kind_of_work == 'Лабораторные работы':
+        return f"<b>Пара{const_dictionary.LAB_EMOJI.get(int(lesson_number))}</b>"
+
+    else:
+        return f"<b>Пара {lesson_number}</b>"
