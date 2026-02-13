@@ -24,65 +24,91 @@ def short_kndwork(kind_of_work):
 def formate_lessons(discipline):
     return const_dictionary.SUBJECTS.get(discipline, discipline)
 
-def default_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group, request_object, url_id=None):
-
-    auditorium_name, auditorium_id = common_func.get_cabinet_info(auditorium, None)
+def default_theme(lesson_number, begin_lessson, end_lesson, auditorium, 
+                  lecturer, discipline, kind_of_work, subgroup, user, 
+                  groups,group, request_object, url_id=None
+                  ):
     
+    ### БАЗОВЫЙ ВЫВОД НА ЛЮБОЙ ЗАПРОС ###
+    
+    theme_text = "————————————\n" # ————————————
+    theme_text += f'{common_func.find_emoji_number(kind_of_work, lesson_number)}<b>| {begin_lessson}-{end_lesson}</b>\n' # Пара1️⃣| 08:15-09:50
+    theme_text += f"📚{formate_lessons(discipline)} - {short_kndwork(kind_of_work)}\n" # 📚Физика - Практическое занятие
 
-    if request_object == 'cab':
-        theme_text = "————————————\n" # ————————————
-        theme_text += f'{common_func.find_emoji_number(kind_of_work, lesson_number)}<b>| {begin_lessson}-{end_lesson}</b>\n' # Пара1️⃣| 08:15-09:50
-        theme_text += f"📚{formate_lessons(discipline)} - {short_kndwork(kind_of_work)}\n" # 📚Физика - Практическое занятие
+    if subgroup:
+        theme_text += f"🔹Подгруппа: {subgroup[-1]}\n" #🔹Подгруппа: 1
 
-        if subgroup:
-            theme_text += f"🔹Подгруппа: {subgroup[-1]}\n" #🔹Подгруппа: 1
+    ### ИМПОРТ ПАРАМЕТРОВ В ФУНКЦИИ ###
 
-        teacher_id = teachers_file.get_teacher_id(common_func.short_name(lecturer)) 
-        theme_text += f'<a href="{BOT_LINK}start=teacher_{teacher_id}">🎓{lecturer}</a>\n' # 🎓Препоадаватель Препоадаватель Препоадаватель 
+    ctx = {
+        'auditorium': auditorium,
+        'lecturer': lecturer,
+        'groups': groups,
+        'group': group,
+        'subgroup': subgroup,
+        'user': user
+    }
 
-        if groups is None:
-            theme_text += f'👥Группа: {group}\n' # 👥Группа: 1111
-        else:
-            theme_text += f'👥Группы: {groups}\n' # 👥Группы: 1111 2222 3333
-            
-    elif request_object == 'teacher':
-        theme_text = "————————————\n" # ————————————
-        theme_text += f'{common_func.find_emoji_number(kind_of_work, lesson_number)}<b>| {begin_lessson}-{end_lesson}</b>\n' # Пара1️⃣| 08:15-09:50
-        theme_text += f"📚{formate_lessons(discipline)} - {short_kndwork(kind_of_work)}\n" # 📚Физика - Практическое занятие
+    ### ВЫВОД ТЕМЫ ###  
 
-        if _is_linkable_aud(auditorium) and auditorium_id: # 🏫3/351 
-            theme_text += f'<a href="{BOT_LINK}start=cab_{auditorium_id}">🏫{auditorium}</a>\n'
-        else:
-            theme_text += f"🏫{auditorium}\n"
-        if subgroup:
-            theme_text += f"🔹Подгруппа: {subgroup[-1]}\n" #🔹Подгруппа: 1
+    render = THEME_RENDERS.get(request_object, THEME_RENDERS['default'])
 
-        if groups is None:
-            theme_text += f'👥Группа: {group}\n' # 👥Группа: 1111
-        else:
-            theme_text += f'👥Группы: {groups}\n' # 👥Группы: 1111 2222 3333
+    theme_text += render(ctx)
+
+    return theme_text
+
+def render_cabinet_theme(ctx):
+
+    theme_text = ''
+
+    teacher_id = teachers_file.get_teacher_id(common_func.short_name(ctx['lecturer'])) 
+    theme_text += f'<a href="{BOT_LINK}start=teacher_{teacher_id}">🎓{ctx["lecturer"]}</a>\n' # 🎓Препоадаватель Препоадаватель Препоадаватель 
+
+    if ctx['groups'] is None:
+           theme_text += f'👥Группа: {ctx["group"]}\n' # 👥Группа: 1111
     else:
-        theme_text = "————————————\n" # ————————————
-        theme_text += f'{common_func.find_emoji_number(kind_of_work, lesson_number)}<b>| {begin_lessson}-{end_lesson}</b>\n' # Пара1️⃣| 08:15-09:50
-        theme_text += f"📚{formate_lessons(discipline)} - {short_kndwork(kind_of_work)}\n" # 📚Физика - Практическое занятие
+        theme_text += f'👥Группы: {ctx["groups"]}\n' # 👥Группы: 1111 2222 3333
 
-        if subgroup:
-            theme_text += f"🔹Подгруппа: {subgroup[-1]}\n" #🔹Подгруппа: 1
-        
-        if _is_linkable_aud(auditorium) and auditorium_id: # 🏫3/351 
-            theme_text += f'<a href="{BOT_LINK}start=cab_{auditorium_id}">🏫{auditorium}</a>\n'
-        else:
-            theme_text += f"🏫{auditorium}\n"
-        
-        if user == 'student':
-            teacher_id = teachers_file.get_teacher_id(common_func.short_name(lecturer)) 
-            theme_text += f'<a href="{BOT_LINK}start=teacher_{teacher_id}">🎓{lecturer}</a>\n' # 🎓Препоадаватель Препоадаватель Препоадаватель 
-        else:
-            if groups is None:
-                theme_text += f'👥Группа: {group}\n' # 👥Группа: 1111
-            else:
-                theme_text += f'👥Группы: {groups}\n' # 👥Группы: 1111 2222 3333
+    return theme_text
+
+def render_teacher_theme(ctx):
     
+    theme_text = ''
+
+    auditorium_name, auditorium_id = common_func.get_cabinet_info(ctx['auditorium'], None)
+
+    if _is_linkable_aud(ctx['auditorium']) and auditorium_id: # 🏫3/351 
+        theme_text += f'<a href="{BOT_LINK}start=cab_{auditorium_id}">🏫{ctx["auditorium"]}</a>\n'
+    else:
+        theme_text += f"🏫{ctx['auditorium']}\n"
+
+    if ctx['groups'] is None:
+        theme_text += f'👥Группа: {ctx["group"]}\n' # 👥Группа: 1111
+    else:
+        theme_text += f'👥Группы: {ctx["groups"]}\n' # 👥Группы: 1111 2222 3333
+
+    return theme_text
+
+def render_default_theme(ctx):
+
+    theme_text = ''
+
+    auditorium_name, auditorium_id = common_func.get_cabinet_info(ctx['auditorium'], None)
+
+    if _is_linkable_aud(ctx['auditorium']) and auditorium_id: # 🏫3/351 
+            theme_text += f'<a href="{BOT_LINK}start=cab_{auditorium_id}">🏫{ctx["auditorium"]}</a>\n'
+    else:
+        theme_text += f"🏫{ctx['auditorium']}\n"
+        
+    if ctx['user'] == 'student':
+        teacher_id = teachers_file.get_teacher_id(common_func.short_name(ctx['lecturer'])) 
+        theme_text += f'<a href="{BOT_LINK}start=teacher_{teacher_id}">🎓{ctx["lecturer"]}</a>\n' # 🎓Препоадаватель Препоадаватель Препоадаватель 
+    else:
+        if ctx['groups'] is None:
+            theme_text += f'👥Группа: {ctx["group"]}\n' # 👥Группа: 1111
+        else:
+            theme_text += f'👥Группы: {ctx["groups"]}\n' # 👥Группы: 1111 2222 3333
+
     return theme_text
 
 def old_theme(lesson_number, begin_lessson, end_lesson, auditorium, lecturer, discipline, kind_of_work, subgroup, user, groups, group, url_id=None):
@@ -153,3 +179,8 @@ themes = {
     'marker': marker_theme
 }
 
+THEME_RENDERS = {
+    'cab': render_cabinet_theme,
+    'teacher': render_teacher_theme,
+    'default': render_default_theme
+}
