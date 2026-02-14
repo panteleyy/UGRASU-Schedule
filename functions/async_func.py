@@ -48,10 +48,10 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
             return
         
     except asyncio.TimeoutError:
-        await message.answer("Сервер ЮГУ не отвечает")
+        await message.answer("⚠️ Сервер ЮГУ не отвечает, попробуйте позже")
     except Exception as e:
         print(f"Ошибка: {e}")
-        await message.answer("Не удалось получить расписание")
+        await message.answer("⚠️ Не удалось получить расписание, попробуйте позже")
 
     user = common_func.user_configs.get(user_id, {}).get('who')
     group_name, facultyOid = common_func.get_group_name(message, group_id) # Получаем имя группы или преподавателя и номер факультета
@@ -171,10 +171,10 @@ async def shedule_by_date_link(message, date, day, month, weekday, user_id, comm
             return
         
     except asyncio.TimeoutError:
-        await message.answer("Сервер ЮГУ не отвечает")
+        await message.answer("⚠️ Сервер ЮГУ не отвечает, попробуйте позже")
     except Exception as e:
         print(f"Ошибка: {e}")
-        await message.answer("Не удалось получить расписание")
+        await message.answer("⚠️ Не удалось получить расписание, попробуйте позже")
     
     user_theme = common_func.user_configs.get(user_id, {}).get('theme')
 
