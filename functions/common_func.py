@@ -303,7 +303,7 @@ def find_emoji_number(kind_of_work, lesson_number): # kind_of_wordk --> str, les
     elif kind_of_work == 'Пересдача дифференцированного зачета' or kind_of_work == 'Дифференцированный зачет' or kind_of_work == 'Пересдача зачёта':
         return f"<b>Пара{const_dictionary.DIFF_EMOJI.get(int(lesson_number))}</b>"
 
-    elif kind_of_work == 'Внеаудиторная ' or kind_of_work == 'Учебные практики (О)':
+    elif kind_of_work == 'Внеаудиторная ' or kind_of_work == 'Учебные практики (О)' or kind_of_work == 'Курсовое проектирование':
         return f"<b>Пара{const_dictionary.TALKING_EMOJI.get(int(lesson_number))}</b>"
 
     elif kind_of_work == 'Лабораторные работы':
