@@ -144,7 +144,13 @@ def get_group_name(message, group_id):
     facultyOid = user_configs.get(user_id, {}).get('facultyOid')
 
     group_url = f'{API_BASE_URL}/groups?facultyOid={facultyOid}'
-    group_r = requests.get(group_url)
+
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json"
+    }
+
+    group_r = requests.get(group_url, headers=headers)
     names = group_r.json()
 
     if who == 'student':
