@@ -18,7 +18,7 @@ You can find all used framework below.
 |------|--------------|
 | 🐍 **Python 3.14.2** | Main programmin language |
 | 🤖 **aiogram 3.24.0** | Modern asynchronous framework for Telegram bots |
-| 🌐 **requests 2.32.5** | Framework for HTTP requests |
+| 🌐 **aiohttp 3.13.3** | Framework for async HTTP requests |
 | 🗝️ **python-dotenv 1.2.1** | Used to load environment variables (like tokens and API keys) from a .env file |
 
 # How to build?
