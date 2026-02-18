@@ -1,4 +1,5 @@
 import json
+from matplotlib import text
 import requests
 from datetime import datetime
 import json
@@ -6,6 +7,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 import asyncio
+import bot
 
 from functions import common_func
 from keyboards import reply
@@ -15,6 +17,7 @@ from functions import teachers_file
 
 load_dotenv()
 API_BASE_URL = os.getenv('API_BASE_URL')
+ADMIN_ID = int(os.getenv('ADMIN_ID'))
 
 request_counter = 0
 
@@ -48,11 +51,19 @@ async def shedule_by_date(message, date, day, month, weekday, user_id, url_id):
             return
         
     except asyncio.TimeoutError:
-        await message.answer("⚠️ Сервер ЮГУ не отвечает, попробуйте позже")
+            await message.answer("⚠️ Сервер ЮГУ не отвечает, попробуйте позже")
+            return
+
     except Exception as e:
         print(f"Ошибка: {e}")
+        await message.bot.send_message(
+            chat_id=ADMIN_ID,
+            text=f"⚠️ Ошибка при получении расписания:\n<code>{e}</code>",
+            parse_mode="HTML"
+        )
         await message.answer("⚠️ Не удалось получить расписание, попробуйте позже")
-
+        return
+    
     user = common_func.user_configs.get(user_id, {}).get('who')
     group_name, facultyOid = common_func.get_group_name(message, group_id) # Получаем имя группы или преподавателя и номер факультета
     
@@ -171,10 +182,18 @@ async def shedule_by_date_link(message, date, day, month, weekday, user_id, comm
             return
         
     except asyncio.TimeoutError:
-        await message.answer("⚠️ Сервер ЮГУ не отвечает, попробуйте позже")
+            await message.answer("⚠️ Сервер ЮГУ не отвечает, попробуйте позже")
+            return
+
     except Exception as e:
         print(f"Ошибка: {e}")
+        await message.bot.send_message(
+            chat_id=ADMIN_ID,
+            text=f"⚠️ Ошибка при получении расписания:\n<code>{e}</code>",
+            parse_mode="HTML"
+        )
         await message.answer("⚠️ Не удалось получить расписание, попробуйте позже")
+        return
     
     user_theme = common_func.user_configs.get(user_id, {}).get('theme')
 

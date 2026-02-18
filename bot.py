@@ -44,15 +44,15 @@ async def main():
             except Exception as e:
                 print(f'[LOGS ERROR] Ошибка при отправке логов: {e}')
 
-            await asyncio.sleep(3600)
+            await asyncio.sleep (3600)
 
     aiohttp_session = aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=15),
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0",
-            "Accept": "application/json, text/plain, */*",
-            "Origin": "https://itport.ugrasu.ru",
-            "Referer": "https://itport.ugrasu.ru/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Referer": "https://www.ugrasu.ru/",
+        "Origin": "https://www.ugrasu.ru"
         }
     )
 
