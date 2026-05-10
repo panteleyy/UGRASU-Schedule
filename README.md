@@ -68,7 +68,7 @@ More screenshots can be found in the `images/` directory inside the repository.
 
 
 # Author
-Kirill (panteleey)
+panteleey
 
 # License
 **Attribution-NonCommercial-ShareAlike 4.0 International**
