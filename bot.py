@@ -73,7 +73,7 @@ async def main():
     try:
         await dp.start_polling(bot)
     finally:
-        if not bot.session.closed:
+        if not bot.session.close:
             await bot.session.close()
             print('Сессия закрыта')
 
